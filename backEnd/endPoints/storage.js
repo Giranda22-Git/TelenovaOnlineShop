@@ -5,13 +5,13 @@ const mongoStorage = require('../models/Storage.js').mongoStorage
 const mongoBackUp = require('../models/BackUp.js').mongoBackUp
 
 router.get('/', async (req, res) => {
-    const result = await mongoMessages.find().exec()
-    res.status(200).json(result)
+  const result = await mongoMessages.find().exec()
+  res.status(200).json(result)
 })
 
 // begin new data parser
 router.post('/updateData', async (req, res) => {
-    let data =
+  let data =
     `
     <?xml version="1.0" encoding="UTF-8"?>
     <yml_catalog date="2020-11-22T14:37:38+03:00">
@@ -145,30 +145,30 @@ router.post('/updateData', async (req, res) => {
         </shop>
     </yml_catalog>
     `
-    const options = {
-        ignoreAttributes: false
-    }
+  const options = {
+    ignoreAttributes: false
+  }
 
-    data = xml_parser.parse(data, options)
+  data = xml_parser.parse(data, options)
 
-    data.yml_catalog.shop.offers.offer.forEach(async offer => {
-        const tmp = new mongoStorage({
-            offerData: offer
-        })
-        await tmp.save()
+  data.yml_catalog.shop.offers.offer.forEach(async offer => {
+    const tmp = new mongoStorage({
+      offerData: offer
     })
+    await tmp.save()
+  })
 
-    const oldBackUp = await mongoBackUp.findOne({ trigger: 'current' }).exec()
-    if (oldBackUp) {
-        await mongoBackUp.deleteOne({ trigger: 'current' }).exec()
-    }
+  const oldBackUp = await mongoBackUp.findOne({ trigger: 'current' }).exec()
+  if (oldBackUp) {
+    await mongoBackUp.deleteOne({ trigger: 'current' }).exec()
+  }
 
-    const newBackUp = new mongoBackUp({
-        allData: data
-    })
-    await newBackUp.save()
+  const newBackUp = new mongoBackUp({
+    allData: data
+  })
+  await newBackUp.save()
 
-    res.send(oldBackUp)
+  res.send(oldBackUp)
 })
 
 /*
@@ -185,8 +185,8 @@ content-type: application/json
 // begin get all categories
 
 router.get('/getAllCategories', async (req, res) => {
-    const currentBackUp = await mongoBackUp.findOne({ trigger: 'current' }).exec()
-    res.send(currentBackUp.allData.yml_catalog.shop.categories.category)
+  const currentBackUp = await mongoBackUp.findOne({ trigger: 'current' }).exec()
+  res.send(currentBackUp.allData.yml_catalog.shop.categories.category)
 })
 
 /*
@@ -202,10 +202,10 @@ content-type: application/json
 // begin search items by category
 
 router.post('/search/category', async (req, res) => {
-    const data = req.body
-    const filteredItems = await mongoStorage.find({ 'offerData.categoryId': Number(data.categoryId) }).exec()
-    console.log(filteredItems)
-    res.send(filteredItems)
+  const data = req.body
+  const filteredItems = await mongoStorage.find({ 'offerData.categoryId': Number(data.categoryId) }).exec()
+  console.log(filteredItems)
+  res.send(filteredItems)
 })
 /*
 
@@ -224,66 +224,66 @@ content-type: application/json
 
 // begin search items by price (n to n)
 
-router.post('/search/priceRange', async (req, res) => {
-    let data = req.body
+router.post('/search/filter', async (req, res) => {
+  let data = req.body
 
-    let shop = await  mongoStorage.find().exec()
+  let shop = await mongoStorage.find().exec()
 
-    for (const key in data.filters) {
-        if (key === "category") {
-            shop = shop.filter(element => {
-                return element.offerData.categoryId === data.filters[key]
-            })
-        }
-        else if (key === "priceRange") {
-            shop = shop.filter(element => {
-                return element.offerData.price >= data.filters[key][0] && element.offerData.price <= data.filters[key][1]
-            })
-        }
-        else if (key === "switchers") {
-            for (let index = 0; index < data.filters[key].length; index++) {
-                const switcher = data.filters[key][index]
-                shop = shop.filter(element => {
-                    for (const checkSwitchKey in element.offerData) {
-                        if (checkSwitchKey === switcher.name) {
-                            return switcher.value === element.offerData[checkSwitchKey]
-                        }
-                    }
-
-                    for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
-                        const checkSwitchKey = element.offerData.param[index1]
-                        if (checkSwitchKey['@_name'] === switcher.name) {
-                            return checkSwitchKey['#text'] === switcher.value
-                        }
-                    }
-
-                    return false
-                })
-            }
-        }
-        else if (key === "exceptions") {
-            for (let index = 0; index < data.filters[key].length; index++) {
-                const exception = data.filters[key][index]
-                shop = shop.filter(element => {
-                    for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
-                        const checkExceptionKey = element.offerData.param[index1]
-                        if (checkExceptionKey['@_name'] === exception.name) {
-                            return checkExceptionKey['#text'] === exception.value
-                        }
-                    }
-
-                    return false
-                })
-            }
-        }
+  for (const key in data.filters) {
+    if (key === "category") {
+      shop = shop.filter(element => {
+        return element.offerData.categoryId === data.filters[key]
+      })
     }
+    else if (key === "priceRange") {
+      shop = shop.filter(element => {
+        return element.offerData.price >= data.filters[key][0] && element.offerData.price <= data.filters[key][1]
+      })
+    }
+    else if (key === "switchers") {
+      for (let index = 0; index < data.filters[key].length; index++) {
+        const switcher = data.filters[key][index]
+        shop = shop.filter(element => {
+          for (const checkSwitchKey in element.offerData) {
+            if (checkSwitchKey === switcher.name) {
+              return switcher.value === element.offerData[checkSwitchKey]
+            }
+          }
 
-    res.send(shop)
+          for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
+            const checkSwitchKey = element.offerData.param[index1]
+            if (checkSwitchKey['@_name'] === switcher.name) {
+              return checkSwitchKey['#text'] === switcher.value
+            }
+          }
+
+          return false
+        })
+      }
+    }
+    else if (key === "exceptions") {
+      for (let index = 0; index < data.filters[key].length; index++) {
+        const exception = data.filters[key][index]
+        shop = shop.filter(element => {
+          for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
+            const checkExceptionKey = element.offerData.param[index1]
+            if (checkExceptionKey['@_name'] === exception.name) {
+              return checkExceptionKey['#text'] === exception.value
+            }
+          }
+
+          return false
+        })
+      }
+    }
+  }
+
+  res.send(shop)
 })
 
 /*
 
-POST http://localhost:3000/storage/search/priceRange HTTP/1.1
+POST http://localhost:3000/storage/search/filter HTTP/1.1
 content-type: application/json
 
 {
