@@ -5,7 +5,7 @@ const mongoStorage = require('../models/Storage.js').mongoStorage
 const mongoBackUp = require('../models/BackUp.js').mongoBackUp
 
 router.get('/', async (req, res) => {
-  const result = await mongoMessages.find().exec()
+  const result = await mongoStorage.find().exec()
   res.status(200).json(result)
 })
 
@@ -18,7 +18,7 @@ router.post('/updateData', async (req, res) => {
         <shop>
             <name>BestSeller</name>
             <company>Tne Best inc.</company>
-            <url>http://best.seller.ru</url>
+            <url>https://randart.ru/art/JD99/wallpapers</url>
             <currencies>
                 <currency id="RUR" rate="1"/>
             </currencies>
@@ -32,10 +32,10 @@ router.post('/updateData', async (req, res) => {
             <offers>
                 <offer id="9012">
                     <name>Мороженица Brand 3811</name>
-                    <url>http://best.seller.ru/product_page.asp?pid=12345</url>
-                    <price>500</price>
+                    <url>https://randart.ru/art/JD99/wallpapers</url>
+                    <price>60000</price>
                     <currencyId>RUR</currencyId>
-                    <categoryId>5</categoryId>
+                    <category>Laptop</category>
                     <delivery>true</delivery>
                     <delivery-options>
                         <option cost="300" days="1" order-before="18"/>
@@ -47,10 +47,10 @@ router.post('/updateData', async (req, res) => {
                 </offer>
                 <offer id="9012">
                     <name>Мороженица Brand 3811</name>
-                    <url>http://best.seller.ru/product_page.asp?pid=12345</url>
+                    <url>https://randart.ru/art/JD99/wallpapers</url>
                     <price>8990</price>
                     <currencyId>RUR</currencyId>
-                    <categoryId>10</categoryId>
+                    <category>Television</category>
                     <delivery>true</delivery>
                     <delivery-options>
                         <option cost="300" days="1" order-before="18"/>
@@ -62,10 +62,10 @@ router.post('/updateData', async (req, res) => {
                 </offer>
                 <offer id="9012">
                     <name>Мороженица Brand 3811</name>
-                    <url>http://best.seller.ru/product_page.asp?pid=12345</url>
+                    <url>https://randart.ru/art/JD99/wallpapers</url>
                     <price>8990</price>
                     <currencyId>RUR</currencyId>
-                    <categoryId>10</categoryId>
+                    <category>Phones</category>
                     <delivery>true</delivery>
                     <delivery-options>
                         <option cost="300" days="1" order-before="18"/>
@@ -77,10 +77,10 @@ router.post('/updateData', async (req, res) => {
                 </offer>
                 <offer id="9012">
                     <name>Мороженица Brand 3811</name>
-                    <url>http://best.seller.ru/product_page.asp?pid=12345</url>
+                    <url>https://randart.ru/art/JD99/wallpapers</url>
                     <price>8990</price>
                     <currencyId>RUR</currencyId>
-                    <categoryId>10</categoryId>
+                    <category>Headphones</category>
                     <delivery>true</delivery>
                     <delivery-options>
                         <option cost="300" days="1" order-before="18"/>
@@ -92,10 +92,10 @@ router.post('/updateData', async (req, res) => {
                 </offer>
                 <offer id="9012">
                     <name>Мороженица Brand 3811</name>
-                    <url>http://best.seller.ru/product_page.asp?pid=12345</url>
+                    <url>https://randart.ru/art/JD99/wallpapers</url>
                     <price>8990</price>
                     <currencyId>RUR</currencyId>
-                    <categoryId>10</categoryId>
+                    <category>Computers</category>
                     <delivery>true</delivery>
                     <delivery-options>
                         <option cost="300" days="1" order-before="18"/>
@@ -107,10 +107,10 @@ router.post('/updateData', async (req, res) => {
                 </offer>
                 <offer id="9012">
                     <name>Мороженица Brand 3811</name>
-                    <url>http://best.seller.ru/product_page.asp?pid=12345</url>
+                    <url>https://randart.ru/art/JD99/wallpapers</url>
                     <price>8990</price>
                     <currencyId>RUR</currencyId>
-                    <categoryId>10</categoryId>
+                    <category>Cameras</category>
                     <delivery>true</delivery>
                     <delivery-options>
                         <option cost="300" days="1" order-before="18"/>
@@ -122,9 +122,9 @@ router.post('/updateData', async (req, res) => {
                 </offer>
                 <offer id="9012">
                     <name>Мороженица Brand 3811</name>
-                    <url>http://best.seller.ru/product_page.asp?pid=12345</url>
+                    <url>https://randart.ru/art/JD99/wallpapers</url>
                     <price>8990</price>
-                    <currencyId>RUR</currencyId>
+                    <currency>Sony Playstations</currency>
                     <categoryId>10</categoryId>
                     <delivery>true</delivery>
                     <delivery-options>

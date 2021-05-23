@@ -28,7 +28,7 @@ async function init(serverData) {
 	})
 
 	mongoose.connection.once('open', () => {
-		app.listen(serverData.PORT, (err) => {
+		app.listen(serverData.PORT, '0.0.0.0', (err) => {
 			if (err) return new Error(`error in starting server, error: ${err}`)
 			else console.log(`server started on \nPORT: ${serverData.PORT}\nURL: ${serverData.serverUrl}`)
 		})
