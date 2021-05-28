@@ -3,11 +3,7 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 
-const serverData = {
-	mongoUrl: 'mongodb://localhost:27017/TelenovaOnlineShop',
-	serverUrl: 'http://localhost:3000/',
-	PORT: 3000
-}
+const serverData = require('./staticData/mountedData.js')
 
 const app = express()
 
@@ -35,6 +31,5 @@ async function init(serverData) {
 
 		app.use('/storage', require('./endPoints/storage.js'))
 	})
-
 	mongoose.connection.emit('open')
 }
