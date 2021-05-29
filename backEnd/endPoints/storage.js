@@ -149,8 +149,14 @@ router.post('/updateData', async (req, res) => {
     ignoreAttributes: false
   }
 
+  // xml parsing
   data = xml_parser.parse(data, options)
 
+  // удаление всех старых товаров со склада
+  const resultForDeleteAllStorage = await mongoStorage.deleteMany({})
+  console.log(resultForDeleteAllStorage)
+
+  // добавление всех товаров на склад
   data.yml_catalog.shop.offers.offer.forEach(async offer => {
     const tmp = new mongoStorage({
       offerData: offer
@@ -158,23 +164,26 @@ router.post('/updateData', async (req, res) => {
     await tmp.save()
   })
 
+  // удаление старого бэкапа
   const oldBackUp = await mongoBackUp.findOne({ trigger: 'current' }).exec()
   if (oldBackUp) {
     await mongoBackUp.deleteOne({ trigger: 'current' }).exec()
   }
 
+  // создание нового бэкапа
   const newBackUp = new mongoBackUp({
     allData: data
   })
   await newBackUp.save()
 
+  // в ответ отпраляется старый бэкап
   res.send(oldBackUp)
 })
 
 /*
 TEST:
 
-POST http://localhost:3000/storage/updateData HTTP/1.1
+POST http://localhost:3001/storage/updateData HTTP/1.1
 content-type: application/json
 
 */
@@ -192,39 +201,16 @@ router.get('/getAllCategories', async (req, res) => {
 /*
 TEST:
 
-GET http://localhost:3000/storage/getAllCategories HTTP/1.1
+GET http://localhost:3001/storage/getAllCategories HTTP/1.1
 content-type: application/json
 */
 
 // end get all categories
 
 
-// begin search items by category
+// begin search items
 
-router.post('/search/category', async (req, res) => {
-  const data = req.body
-  const filteredItems = await mongoStorage.find({ 'offerData.categoryId': Number(data.categoryId) }).exec()
-  console.log(filteredItems)
-  res.send(filteredItems)
-})
-/*
-
-POST http://localhost:3000/storage/search/category HTTP/1.1
-content-type: application/json
-
-{
-    "categoryId": "5"
-}
-
-*/
-
-// end search items by category
-
-
-
-// begin search items by price (n to n)
-
-router.post('/search/filter', async (req, res) => {
+router.post('/search', async (req, res) => {
   let data = req.body
 
   let shop = await mongoStorage.find().exec()
@@ -287,34 +273,34 @@ POST http://localhost:3000/storage/search/filter HTTP/1.1
 content-type: application/json
 
 {
-    "filters": {
-        "category": 2,
-        "priceRange": [500, 10000],
-        "switchers": [
-            {
-                "name": "inStock",
-                "value": true
-            },
-            {
-                "name": "delivery",
-                "value": true
-            }
-        ],
-        "exceptions": [
-            {
-                "name": "Цвет",
-                "value": "красный"
-            },
-            {
-                "name": "Вес",
-                "value": "3.4кг"
-            }
-        ]
-    }
+  "filters": {
+    "category": 2,
+    "priceRange": [500, 10000],
+    "switchers": [
+      {
+        "name": "inStock",
+        "value": true
+      },
+      {
+        "name": "delivery",
+        "value": true
+      }
+    ],
+    "exceptions": [
+      {
+        "name": "Цвет",
+        "value": "красный"
+      },
+      {
+        "name": "Вес",
+        "value": "3.4кг"
+      }
+    ]
+  }
 }
 
 */
 
-// end search items by price (n to n)
+// end search items
 
 module.exports = router
