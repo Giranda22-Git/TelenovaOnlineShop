@@ -1,5 +1,9 @@
 const router = require('express').Router()
 const xml_parser = require('fast-xml-parser')
+const WebSocket = require('ws')
+const wsClient = new WebSocket.Server({ port: 1000 })
+
+const wsClients = new Set()
 
 const mongoStorage = require('../models/Storage.js').mongoStorage
 const mongoBackUp = require('../models/BackUp.js').mongoBackUp
@@ -208,6 +212,105 @@ content-type: application/json
 // end get all categories
 
 
+// begin WebSocket Client connection
+wsClient.on('connection', async (client, data) => {
+  const newClient = {
+    connection: client,
+    phoneNumber: data.url.substring(1)
+  }
+
+  wsClients.add(newClient)
+  console.log(`connected client: ${newClient.phoneNumber}`)
+
+  client.on('message', async msg => {
+    msg = JSON.parse(msg)
+
+    console.log(msg)
+
+    if (msg.action === 'search') {
+      const data = msg.data
+
+      let shop = await mongoStorage.find().exec()
+
+      if (data.filters) {
+        for (const key in data.filters) {
+          if (key === "category") {
+            shop = shop.filter(element => {
+              return element.offerData.category === data.filters[key]
+            })
+          }
+          else if (key === "priceRange") {
+            shop = shop.filter(element => {
+              return element.offerData.price >= data.filters[key][0] && element.offerData.price <= data.filters[key][1]
+            })
+          }
+          else if (key === "switchers") {
+            for (let index = 0; index < data.filters[key].length; index++) {
+              const switcher = data.filters[key][index]
+              shop = shop.filter(element => {
+                for (const checkSwitchKey in element.offerData) {
+                  if (checkSwitchKey === switcher.name) {
+                    return switcher.value === element.offerData[checkSwitchKey]
+                  }
+                }
+
+                for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
+                  const checkSwitchKey = element.offerData.param[index1]
+                  if (checkSwitchKey['@_name'] === switcher.name) {
+                    return checkSwitchKey['#text'] === switcher.value
+                  }
+                }
+
+                return false
+              })
+            }
+          }
+          else if (key === "exceptions") {
+            for (let index = 0; index < data.filters[key].length; index++) {
+              const exception = data.filters[key][index]
+              shop = shop.filter(element => {
+                for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
+                  const checkExceptionKey = element.offerData.param[index1]
+                  if (checkExceptionKey['@_name'] === exception.name) {
+                    return checkExceptionKey['#text'] === exception.value
+                  }
+                }
+
+                return false
+              })
+            }
+          }
+        }
+      }
+      if (data.query) {
+        const queryArray = data.query.split('')
+        const resultArray = new Array()
+        shop.forEach(product => {
+          let coincidence = 0
+          queryArray.forEach(symbol => {
+            if (product.offerData.name.includes(symbol))
+              coincidence++
+          })
+
+          const result = (coincidence / queryArray.length) * 100
+          console.log(product.offerData.name, queryArray, result)
+
+          if (result >= 80)
+            resultArray.push(product)
+        })
+        shop = resultArray
+      }
+      client.send(JSON.stringify(shop))
+    }
+  })
+
+  client.on('close', () => {
+    clients.delete(newClient)
+    console.log(`deleted: ${newClient.phoneNumber}`)
+  })
+})
+
+
 // begin search items
 
 router.post('/search', async (req, res) => {
@@ -215,53 +318,73 @@ router.post('/search', async (req, res) => {
 
   let shop = await mongoStorage.find().exec()
 
-  for (const key in data.filters) {
-    if (key === "category") {
-      shop = shop.filter(element => {
-        return element.offerData.categoryId === data.filters[key]
-      })
-    }
-    else if (key === "priceRange") {
-      shop = shop.filter(element => {
-        return element.offerData.price >= data.filters[key][0] && element.offerData.price <= data.filters[key][1]
-      })
-    }
-    else if (key === "switchers") {
-      for (let index = 0; index < data.filters[key].length; index++) {
-        const switcher = data.filters[key][index]
+  if (data.filters) {
+    for (const key in data.filters) {
+      if (key === "category") {
         shop = shop.filter(element => {
-          for (const checkSwitchKey in element.offerData) {
-            if (checkSwitchKey === switcher.name) {
-              return switcher.value === element.offerData[checkSwitchKey]
-            }
-          }
-
-          for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
-            const checkSwitchKey = element.offerData.param[index1]
-            if (checkSwitchKey['@_name'] === switcher.name) {
-              return checkSwitchKey['#text'] === switcher.value
-            }
-          }
-
-          return false
+          return element.offerData.category === data.filters[key]
         })
       }
-    }
-    else if (key === "exceptions") {
-      for (let index = 0; index < data.filters[key].length; index++) {
-        const exception = data.filters[key][index]
+      else if (key === "priceRange") {
         shop = shop.filter(element => {
-          for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
-            const checkExceptionKey = element.offerData.param[index1]
-            if (checkExceptionKey['@_name'] === exception.name) {
-              return checkExceptionKey['#text'] === exception.value
-            }
-          }
-
-          return false
+          return element.offerData.price >= data.filters[key][0] && element.offerData.price <= data.filters[key][1]
         })
       }
+      else if (key === "switchers") {
+        for (let index = 0; index < data.filters[key].length; index++) {
+          const switcher = data.filters[key][index]
+          shop = shop.filter(element => {
+            for (const checkSwitchKey in element.offerData) {
+              if (checkSwitchKey === switcher.name) {
+                return switcher.value === element.offerData[checkSwitchKey]
+              }
+            }
+
+            for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
+              const checkSwitchKey = element.offerData.param[index1]
+              if (checkSwitchKey['@_name'] === switcher.name) {
+                return checkSwitchKey['#text'] === switcher.value
+              }
+            }
+
+            return false
+          })
+        }
+      }
+      else if (key === "exceptions") {
+        for (let index = 0; index < data.filters[key].length; index++) {
+          const exception = data.filters[key][index]
+          shop = shop.filter(element => {
+            for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
+              const checkExceptionKey = element.offerData.param[index1]
+              if (checkExceptionKey['@_name'] === exception.name) {
+                return checkExceptionKey['#text'] === exception.value
+              }
+            }
+
+            return false
+          })
+        }
+      }
     }
+  }
+  if (data.query) {
+    const queryArray = data.query.split('')
+    const resultArray = new Array()
+    shop.forEach(product => {
+      let coincidence = 0
+      queryArray.forEach(symbol => {
+        if (product.offerData.name.includes(symbol))
+          coincidence++
+      })
+
+      const result = (coincidence / queryArray.length) * 100
+      console.log(product.offerData.name, queryArray, result)
+
+      if (result >= 80)
+        resultArray.push(product)
+    })
+    shop = resultArray
   }
 
   res.send(shop)
@@ -269,18 +392,15 @@ router.post('/search', async (req, res) => {
 
 /*
 
-POST http://localhost:3000/storage/search/filter HTTP/1.1
+POST http://localhost:3001/storage/search HTTP/1.1
 content-type: application/json
 
 {
+  "query": "Моро",
   "filters": {
-    "category": 2,
+    "category": "Computers",
     "priceRange": [500, 10000],
     "switchers": [
-      {
-        "name": "inStock",
-        "value": true
-      },
       {
         "name": "delivery",
         "value": true
@@ -289,7 +409,7 @@ content-type: application/json
     "exceptions": [
       {
         "name": "Цвет",
-        "value": "красный"
+        "value": "белый"
       },
       {
         "name": "Вес",
