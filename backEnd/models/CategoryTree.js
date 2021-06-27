@@ -1,13 +1,13 @@
 const mongoose = require('mongoose')
 
-const backUp = new mongoose.Schema({
+const tree = new mongoose.Schema({
   trigger: {
     type: String,
     default: 'current'
   },
-  allData: {
+  tree: {
     type: Object,
-    required: true
+    default: {}
   },
   dateOfCreature: {
     type: Date,
@@ -15,5 +15,5 @@ const backUp = new mongoose.Schema({
   }
 })
 
-const mongoBackUp = mongoose.model('backUp', backUp)
-module.exports = { mongoBackUp }
+const mongoCategoryTree = mongoose.model('categorytree', tree)
+module.exports = { mongoCategoryTree }

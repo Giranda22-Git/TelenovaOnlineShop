@@ -1,0 +1,48 @@
+{
+  "kaspi_name": "Ritmix ST-111BT Puppy коричневый",
+  "kaspi_id": "100098507",
+  "images": [
+    "https://cdn-kaspi.kz/shop/medias/sys_master/images/images/hc6/haa/11430770278430/xritmix-st-111bt-puppy-koricnevyj-100098507-1.png.pagespeed.ic.Kh2A-4KsAf.jpg",
+    "https://cdn-kaspi.kz/shop/medias/sys_master/images/images/hba/ha7/11430770933790/xritmix-st-111bt-puppy-koricnevyj-100098507-2.png.pagespeed.ic.PZ9OlthK3N.jpg",
+    "https://cdn-kaspi.kz/shop/medias/sys_master/images/images/h9f/h3f/11430804226078/xritmix-st-111bt-puppy-koricnevyj-100098507-3.png.pagespeed.ic.OUzA6C2l0C.jpg"
+  ],
+  "brand": "Ritmix",
+  "category_list": [
+    "Аудиотехника",
+    "Портативные колонки"
+  ],
+  "category_dict": {
+    "Аудиотехника": {
+      "name": "Портативные колонки"
+    }
+  },
+  "properties": {
+    "тип": "моно",
+    "мощность": "3 Вт",
+    "интерфейсы": "Bluetooth",
+    "тип питания": "от батареек, от USB-порта",
+    "количество полос ac": "однополосные"
+  },
+  "additional_properties": {
+    "Характеристики": {
+      "Тип": "моно",
+      "Мощность": "3 Вт",
+      "Питание": "от батарей, от USB",
+      "Цвет": "желтый"
+    },
+    "Акустика": {
+      "Диапазон воспроизводимых частот": "100 - 20000 Гц",
+      "Материал корпуса": "пластик",
+      "Количество полос AC": "однополосные",
+      "Широкополосный динамик": "40&nbspмм"
+    },
+    "Дополнительно": {
+      "Интерфейсы": "Bluetooth",
+      "Дополнительная информация": "Bluetooth 5.0, радиус действия Bluetooth: 10 м; аккумулятор: 400 мАч, 3.7 В; поддержка TWS",
+      "Особенности": "встроенный микрофон, влагозащищенный корпус",
+      "Размеры": "102x71x71 мм"
+    }
+  },
+  "name": "Ritmix ST-111BT Puppy коричневый",
+  "price": 5504
+}

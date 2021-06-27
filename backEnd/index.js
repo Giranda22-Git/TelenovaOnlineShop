@@ -30,6 +30,7 @@ async function init(serverData) {
 		})
 
 		app.use('/storage', require('./endPoints/storage.js'))
+    app.use('/categoryTree', require('./endPoints/tree.js'))
 	})
 	mongoose.connection.emit('open')
 }

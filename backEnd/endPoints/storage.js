@@ -1,205 +1,190 @@
 const router = require('express').Router()
-const xml_parser = require('fast-xml-parser')
 const WebSocket = require('ws')
 const wsClient = new WebSocket.Server({ port: 1000 })
 
 const wsClients = new Set()
 
 const mongoStorage = require('../models/Storage.js').mongoStorage
-const mongoBackUp = require('../models/BackUp.js').mongoBackUp
+const mongoCategoryTree = require('../models/CategoryTree.js').mongoCategoryTree
+
+async function addFirstLevelCategoryTree (category) {
+  const isExists = await mongoCategoryTree.findOne({ trigger: 'current' })
+
+  if (!isExists.tree.hasOwnProperty(category)) {
+    await mongoCategoryTree.updateOne(
+      { trigger: 'current' },
+      { $set: { ['tree.' + category]: new Array()} }
+    )
+  }
+}
+
+async function addSecondLevelCategoryTree (firstCategory, secondCategory) {
+  const isExists = await mongoCategoryTree.findOne({ trigger: 'current' })
+
+  if (!isExists.tree[firstCategory].includes(secondCategory)) {
+    await mongoCategoryTree.updateOne(
+      { trigger: 'current' },
+      { $push: { ['tree.' + firstCategory]: secondCategory } }
+    ).exec()
+  }
+}
+
+async function deleteVoidCategoryTree (firstCategory, secondCategory) {
+  let isExists = await mongoCategoryTree.findOne({ trigger: 'current' }).exec()
+
+  const checkExists = await mongoStorage.find({ 'offerData.category_list':  {$in: [secondCategory]} }).exec()
+
+  if (checkExists.length === 0) {
+    console.log(isExists.tree[firstCategory].indexOf(secondCategory))
+    isExists.tree[firstCategory].splice(isExists.tree[firstCategory].indexOf(secondCategory), 1)
+    await mongoCategoryTree.updateOne(
+      { trigger: 'current' },
+      { ['tree.' + firstCategory]: isExists.tree[firstCategory]}
+    ).exec()
+  }
+
+  isExists = await mongoCategoryTree.findOne({ trigger: 'current' }).exec()
+
+  if (isExists.tree[firstCategory].length === 0) {
+    console.log('firstsLevel')
+    await mongoCategoryTree.updateOne(
+      { trigger: 'current' },
+      { $unset: { ['tree.' + firstCategory]: '' } }
+    )
+  }
+}
+
+function array_compare(a, b)
+{
+  if(a.length != b.length)
+    return false
+
+  for(i = 0; i < a.length; i++)
+    if(a[i] != b[i])
+      return false
+
+  return true
+}
 
 router.get('/', async (req, res) => {
   const result = await mongoStorage.find().exec()
   res.status(200).json(result)
 })
 
-// begin new data parser
-router.post('/updateData', async (req, res) => {
-  let data =
-    `
-    <?xml version="1.0" encoding="UTF-8"?>
-    <yml_catalog date="2020-11-22T14:37:38+03:00">
-        <shop>
-            <name>BestSeller</name>
-            <company>Tne Best inc.</company>
-            <url>https://randart.ru/art/JD99/wallpapers</url>
-            <currencies>
-                <currency id="RUR" rate="1"/>
-            </currencies>
-            <categories>
-                <category id="1">Бытовая техника</category>
-                <category id="10" parentId="1">Мелкая техника для кухни</category>
-            </categories>
-            <delivery-options>
-                <option cost="200" days="1"/>
-            </delivery-options>
-            <offers>
-                <offer id="9012">
-                    <name>Мороженица Brand 3811</name>
-                    <url>https://randart.ru/art/JD99/wallpapers</url>
-                    <price>60000</price>
-                    <currencyId>RUR</currencyId>
-                    <category>Laptop</category>
-                    <delivery>true</delivery>
-                    <delivery-options>
-                        <option cost="300" days="1" order-before="18"/>
-                    </delivery-options>
-                    <param name="Цвет">белый</param>
-                    <param name="Вес">3.4кг</param>
-                    <weight>3.6</weight>
-                    <dimensions>20.1/20.551/22.5</dimensions>
-                </offer>
-                <offer id="9012">
-                    <name>Мороженица Brand 3811</name>
-                    <url>https://randart.ru/art/JD99/wallpapers</url>
-                    <price>8990</price>
-                    <currencyId>RUR</currencyId>
-                    <category>Television</category>
-                    <delivery>true</delivery>
-                    <delivery-options>
-                        <option cost="300" days="1" order-before="18"/>
-                    </delivery-options>
-                    <param name="Цвет">белый</param>
-                    <param name="Вес">3.4кг</param>
-                    <weight>3.6</weight>
-                    <dimensions>20.1/20.551/22.5</dimensions>
-                </offer>
-                <offer id="9012">
-                    <name>Мороженица Brand 3811</name>
-                    <url>https://randart.ru/art/JD99/wallpapers</url>
-                    <price>8990</price>
-                    <currencyId>RUR</currencyId>
-                    <category>Phones</category>
-                    <delivery>true</delivery>
-                    <delivery-options>
-                        <option cost="300" days="1" order-before="18"/>
-                    </delivery-options>
-                    <param name="Цвет">белый</param>
-                    <param name="Вес">3.4кг</param>
-                    <weight>3.6</weight>
-                    <dimensions>20.1/20.551/22.5</dimensions>
-                </offer>
-                <offer id="9012">
-                    <name>Мороженица Brand 3811</name>
-                    <url>https://randart.ru/art/JD99/wallpapers</url>
-                    <price>8990</price>
-                    <currencyId>RUR</currencyId>
-                    <category>Headphones</category>
-                    <delivery>true</delivery>
-                    <delivery-options>
-                        <option cost="300" days="1" order-before="18"/>
-                    </delivery-options>
-                    <param name="Цвет">белый</param>
-                    <param name="Вес">3.4кг</param>
-                    <weight>3.6</weight>
-                    <dimensions>20.1/20.551/22.5</dimensions>
-                </offer>
-                <offer id="9012">
-                    <name>Мороженица Brand 3811</name>
-                    <url>https://randart.ru/art/JD99/wallpapers</url>
-                    <price>8990</price>
-                    <currencyId>RUR</currencyId>
-                    <category>Computers</category>
-                    <delivery>true</delivery>
-                    <delivery-options>
-                        <option cost="300" days="1" order-before="18"/>
-                    </delivery-options>
-                    <param name="Цвет">белый</param>
-                    <param name="Вес">3.4кг</param>
-                    <weight>3.6</weight>
-                    <dimensions>20.1/20.551/22.5</dimensions>
-                </offer>
-                <offer id="9012">
-                    <name>Мороженица Brand 3811</name>
-                    <url>https://randart.ru/art/JD99/wallpapers</url>
-                    <price>8990</price>
-                    <currencyId>RUR</currencyId>
-                    <category>Cameras</category>
-                    <delivery>true</delivery>
-                    <delivery-options>
-                        <option cost="300" days="1" order-before="18"/>
-                    </delivery-options>
-                    <param name="Цвет">белый</param>
-                    <param name="Вес">3.4кг</param>
-                    <weight>3.6</weight>
-                    <dimensions>20.1/20.551/22.5</dimensions>
-                </offer>
-                <offer id="9012">
-                    <name>Мороженица Brand 3811</name>
-                    <url>https://randart.ru/art/JD99/wallpapers</url>
-                    <price>8990</price>
-                    <currency>Sony Playstations</currency>
-                    <categoryId>10</categoryId>
-                    <delivery>true</delivery>
-                    <delivery-options>
-                        <option cost="300" days="1" order-before="18"/>
-                    </delivery-options>
-                    <param name="Цвет">белый</param>
-                    <param name="Вес">3.4кг</param>
-                    <weight>3.6</weight>
-                    <dimensions>20.1/20.551/22.5</dimensions>
-                </offer>
-            </offers>
-            <gifts>
-                <!-- подарки не из прайс‑листа -->
-            </gifts>
-            <promos>
-                <!-- промоакции -->
-            </promos>
-        </shop>
-    </yml_catalog>
-    `
-  const options = {
-    ignoreAttributes: false
-  }
-
-  // xml parsing
-  data = xml_parser.parse(data, options)
-
-  // удаление всех старых товаров со склада
-  const resultForDeleteAllStorage = await mongoStorage.deleteMany({})
-  console.log(resultForDeleteAllStorage)
+// begin add new goods
+router.post('/addGoods', async (req, res) => {
+  const data = req.body
 
   // добавление всех товаров на склад
-  data.yml_catalog.shop.offers.offer.forEach(async offer => {
+  for (const offer of data.offers) {
+    const inStock = await mongoStorage.findOne({ 'offerData.kaspi_id': offer.kaspi_id })
+    if (inStock) {
+      await mongoStorage.deleteOne({ 'offerData.kaspi_id': offer.kaspi_id })
+      if (!array_compare(inStock.offerData.category_list, offer.category_list)) {
+        // удаление категорий в случае их изменения
+        deleteVoidCategoryTree(inStock.offerData.category_list[0], inStock.offerData.category_list[1])
+      }
+    }
+
     const tmp = new mongoStorage({
-      offerData: offer
+      offerData: offer,
+      dateOfCreature: new Date()
     })
     await tmp.save()
-  })
 
-  // удаление старого бэкапа
-  const oldBackUp = await mongoBackUp.findOne({ trigger: 'current' }).exec()
-  if (oldBackUp) {
-    await mongoBackUp.deleteOne({ trigger: 'current' }).exec()
+    // добавление категории первого уровня
+    await addFirstLevelCategoryTree(offer.category_list[0])
+
+    // добавление категории второго уровня
+    await addSecondLevelCategoryTree(offer.category_list[0], offer.category_list[1])
   }
 
-  // создание нового бэкапа
-  const newBackUp = new mongoBackUp({
-    allData: data
-  })
-  await newBackUp.save()
-
-  // в ответ отпраляется старый бэкап
-  res.send(oldBackUp)
+  res.sendStatus(200)
 })
 
 /*
 TEST:
 
-POST http://localhost:3001/storage/updateData HTTP/1.1
+POST http://localhost:3001/storage/addGoods HTTP/1.1
+content-type: application/json
+*/
+// end add new goods
+
+
+// begin delete goods by kaspi_id
+
+router.post('/deleteGoods', async (req, res) => {
+  const data = req.body
+
+  for (const kaspi_id of data.deleteArray) {
+    const tmp = await mongoStorage.findOne({ 'offerData.kaspi_id': kaspi_id })
+    await mongoStorage.deleteOne({ 'offerData.kaspi_id': kaspi_id })
+    await deleteVoidCategoryTree(tmp.offerData.category_list[0], tmp.offerData.category_list[1])
+  }
+
+  res.sendStatus(200)
+})
+/*
+TEST:
+
+POST http://localhost:3001/storage/deleteGoods HTTP/1.1
 content-type: application/json
 
+{
+  "deleteArray": [
+    "100098506",
+    "100098508"
+  ]
+}
 */
-// end new data parser
+// end delete goods by kaspi_id
 
+
+// begin update inStock status
+router.post('/updateInStock', async (req, res) => {
+  const data = req.body
+
+  const result = await mongoStorage.updateOne({ 'offerData.kaspi_id': data.kaspi_id }, { inStock: data.value })
+
+  res.json(result)
+})
+/*
+POST http://localhost:3001/storage/updateInStock HTTP/1.1
+content-type: application/json
+
+{
+  "kaspi_id": "100098506",
+  "value": true
+}
+*/
+// begin update inStock status
+
+
+// begin update active status
+router.post('/updateActive', async (req, res) => {
+  const data = req.body
+
+  const result = await mongoStorage.updateOne({ 'offerData.kaspi_id': data.kaspi_id }, { active: data.value })
+
+  res.json(result)
+})
+/*
+POST http://localhost:3001/storage/updateActive HTTP/1.1
+content-type: application/json
+
+{
+  "kaspi_id": "100098506",
+  "value": true
+}
+*/
+// begin update active status
 
 
 // begin get all categories
 
 router.get('/getAllCategories', async (req, res) => {
-  const currentBackUp = await mongoBackUp.findOne({ trigger: 'current' }).exec()
-  res.send(currentBackUp.allData.yml_catalog.shop.categories.category)
+  const tree = await mongoCategoryTree.findOne({ trigger: 'current' }).exec()
+  res.status(200).json(tree)
 })
 
 /*
@@ -227,6 +212,7 @@ wsClient.on('connection', async (client, data) => {
 
     console.log(msg)
 
+    // begin ws search
     if (msg.action === 'search') {
       const data = msg.data
 
@@ -234,9 +220,14 @@ wsClient.on('connection', async (client, data) => {
 
       if (data.filters) {
         for (const key in data.filters) {
-          if (key === "category") {
+          if (key === "firstLevelCategory") {
             shop = shop.filter(element => {
-              return element.offerData.category === data.filters[key]
+              return element.offerData.category_list[0] === data.filters[key]
+            })
+          }
+          else if (key === "secondLevelCategory") {
+            shop = shop.filter(element => {
+              return element.offerData.category_list[1] === data.filters[key]
             })
           }
           else if (key === "priceRange") {
@@ -248,18 +239,18 @@ wsClient.on('connection', async (client, data) => {
             for (let index = 0; index < data.filters[key].length; index++) {
               const switcher = data.filters[key][index]
               shop = shop.filter(element => {
-                for (const checkSwitchKey in element.offerData) {
+                for (const checkSwitchKey in element) {
                   if (checkSwitchKey === switcher.name) {
-                    return switcher.value === element.offerData[checkSwitchKey]
+                    return switcher.value === element[checkSwitchKey]
                   }
                 }
 
-                for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
-                  const checkSwitchKey = element.offerData.param[index1]
-                  if (checkSwitchKey['@_name'] === switcher.name) {
-                    return checkSwitchKey['#text'] === switcher.value
-                  }
-                }
+                // for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
+                //   const checkSwitchKey = element.offerData.param[index1]
+                //   if (checkSwitchKey['@_name'] === switcher.name) {
+                //     return checkSwitchKey['#text'] === switcher.value
+                //   }
+                // }
 
                 return false
               })
@@ -268,16 +259,28 @@ wsClient.on('connection', async (client, data) => {
           else if (key === "exceptions") {
             for (let index = 0; index < data.filters[key].length; index++) {
               const exception = data.filters[key][index]
+
+              // shop = shop.filter(element => {
+              //   for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
+              //     const checkExceptionKey = element.offerData.param[index1]
+              //     if (checkExceptionKey['@_name'] === exception.name) {
+              //       return checkExceptionKey['#text'] === exception.value
+              //     }
+              //   }
+
+              //   return false
+              // })
+
               shop = shop.filter(element => {
-                for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
-                  const checkExceptionKey = element.offerData.param[index1]
-                  if (checkExceptionKey['@_name'] === exception.name) {
-                    return checkExceptionKey['#text'] === exception.value
+                for (const indexKey in element.offerData.properties) {
+                  if (indexKey === exception.name) {
+                    return element.offerData.properties[indexKey] === exception.value
                   }
                 }
 
                 return false
               })
+
             }
           }
         }
@@ -303,91 +306,12 @@ wsClient.on('connection', async (client, data) => {
       client.send(JSON.stringify(shop))
     }
   })
+  // end ws search
 
   client.on('close', () => {
     clients.delete(newClient)
     console.log(`deleted: ${newClient.phoneNumber}`)
   })
-})
-
-
-// begin search items
-
-router.post('/search', async (req, res) => {
-  let data = req.body
-
-  let shop = await mongoStorage.find().exec()
-
-  if (data.filters) {
-    for (const key in data.filters) {
-      if (key === "category") {
-        shop = shop.filter(element => {
-          return element.offerData.category === data.filters[key]
-        })
-      }
-      else if (key === "priceRange") {
-        shop = shop.filter(element => {
-          return element.offerData.price >= data.filters[key][0] && element.offerData.price <= data.filters[key][1]
-        })
-      }
-      else if (key === "switchers") {
-        for (let index = 0; index < data.filters[key].length; index++) {
-          const switcher = data.filters[key][index]
-          shop = shop.filter(element => {
-            for (const checkSwitchKey in element.offerData) {
-              if (checkSwitchKey === switcher.name) {
-                return switcher.value === element.offerData[checkSwitchKey]
-              }
-            }
-
-            for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
-              const checkSwitchKey = element.offerData.param[index1]
-              if (checkSwitchKey['@_name'] === switcher.name) {
-                return checkSwitchKey['#text'] === switcher.value
-              }
-            }
-
-            return false
-          })
-        }
-      }
-      else if (key === "exceptions") {
-        for (let index = 0; index < data.filters[key].length; index++) {
-          const exception = data.filters[key][index]
-          shop = shop.filter(element => {
-            for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
-              const checkExceptionKey = element.offerData.param[index1]
-              if (checkExceptionKey['@_name'] === exception.name) {
-                return checkExceptionKey['#text'] === exception.value
-              }
-            }
-
-            return false
-          })
-        }
-      }
-    }
-  }
-  if (data.query) {
-    const queryArray = data.query.split('')
-    const resultArray = new Array()
-    shop.forEach(product => {
-      let coincidence = 0
-      queryArray.forEach(symbol => {
-        if (product.offerData.name.includes(symbol))
-          coincidence++
-      })
-
-      const result = (coincidence / queryArray.length) * 100
-      console.log(product.offerData.name, queryArray, result)
-
-      if (result >= 80)
-        resultArray.push(product)
-    })
-    shop = resultArray
-  }
-
-  res.send(shop)
 })
 
 /*
@@ -396,24 +320,25 @@ POST http://localhost:3001/storage/search HTTP/1.1
 content-type: application/json
 
 {
-  "query": "Моро",
+  "query": "Ritmix",
   "filters": {
-    "category": "Computers",
+    "firstLevelCategory": "Аудиотехника",
+    "secondLevelCategory": "Портативные колонки",
     "priceRange": [500, 10000],
     "switchers": [
       {
-        "name": "delivery",
+        "name": "inStock",
         "value": true
       }
     ],
     "exceptions": [
       {
-        "name": "Цвет",
-        "value": "белый"
+        "name": "тип",
+        "value": "моно"
       },
       {
-        "name": "Вес",
-        "value": "3.4кг"
+        "name": "мощность",
+        "value": "3 Вт"
       }
     ]
   }
@@ -421,6 +346,89 @@ content-type: application/json
 
 */
 
-// end search items
+
 
 module.exports = router
+
+
+
+// begin search items
+
+// router.post('/search', async (req, res) => {
+//   let data = req.body
+
+//   let shop = await mongoStorage.find().exec()
+
+//   if (data.filters) {
+//     for (const key in data.filters) {
+//       if (key === "category") {
+//         shop = shop.filter(element => {
+//           return element.offerData.category === data.filters[key]
+//         })
+//       }
+//       else if (key === "priceRange") {
+//         shop = shop.filter(element => {
+//           return element.offerData.price >= data.filters[key][0] && element.offerData.price <= data.filters[key][1]
+//         })
+//       }
+//       else if (key === "switchers") {
+//         for (let index = 0; index < data.filters[key].length; index++) {
+//           const switcher = data.filters[key][index]
+//           shop = shop.filter(element => {
+//             for (const checkSwitchKey in element.offerData) {
+//               if (checkSwitchKey === switcher.name) {
+//                 return switcher.value === element.offerData[checkSwitchKey]
+//               }
+//             }
+
+//             for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
+//               const checkSwitchKey = element.offerData.param[index1]
+//               if (checkSwitchKey['@_name'] === switcher.name) {
+//                 return checkSwitchKey['#text'] === switcher.value
+//               }
+//             }
+
+//             return false
+//           })
+//         }
+//       }
+//       else if (key === "exceptions") {
+//         for (let index = 0; index < data.filters[key].length; index++) {
+//           const exception = data.filters[key][index]
+//           shop = shop.filter(element => {
+//             for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
+//               const checkExceptionKey = element.offerData.param[index1]
+//               if (checkExceptionKey['@_name'] === exception.name) {
+//                 return checkExceptionKey['#text'] === exception.value
+//               }
+//             }
+
+//             return false
+//           })
+//         }
+//       }
+//     }
+//   }
+//   if (data.query) {
+//     const queryArray = data.query.split('')
+//     const resultArray = new Array()
+//     shop.forEach(product => {
+//       let coincidence = 0
+//       queryArray.forEach(symbol => {
+//         if (product.offerData.name.includes(symbol))
+//           coincidence++
+//       })
+
+//       const result = (coincidence / queryArray.length) * 100
+//       console.log(product.offerData.name, queryArray, result)
+
+//       if (result >= 80)
+//         resultArray.push(product)
+//     })
+//     shop = resultArray
+//   }
+
+//   res.send(shop)
+// })
+
+// end search items
