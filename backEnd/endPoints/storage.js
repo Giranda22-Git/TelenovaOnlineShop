@@ -326,7 +326,7 @@ wsClient.on('connection', async (client, data) => {
       // }
 
       result_data = {}
-      for (var product of a) {
+      for (var product of shop) {
         product_data = product['offerData']
 
         for (const property of Object.keys(product_data['properties'])) {
