@@ -7,18 +7,18 @@ const wsClients = new Set()
 const mongoStorage = require('../models/Storage.js').mongoStorage
 const mongoCategoryTree = require('../models/CategoryTree.js').mongoCategoryTree
 
-async function addFirstLevelCategoryTree (category) {
+async function addFirstLevelCategoryTree(category) {
   const isExists = await mongoCategoryTree.findOne({ trigger: 'current' })
 
   if (!isExists.tree.hasOwnProperty(category)) {
     await mongoCategoryTree.updateOne(
       { trigger: 'current' },
-      { $set: { ['tree.' + category]: new Array()} }
+      { $set: { ['tree.' + category]: new Array() } }
     )
   }
 }
 
-async function addSecondLevelCategoryTree (firstCategory, secondCategory) {
+async function addSecondLevelCategoryTree(firstCategory, secondCategory) {
   const isExists = await mongoCategoryTree.findOne({ trigger: 'current' })
 
   if (!isExists.tree[firstCategory].includes(secondCategory)) {
@@ -29,17 +29,17 @@ async function addSecondLevelCategoryTree (firstCategory, secondCategory) {
   }
 }
 
-async function deleteVoidCategoryTree (firstCategory, secondCategory) {
+async function deleteVoidCategoryTree(firstCategory, secondCategory) {
   let isExists = await mongoCategoryTree.findOne({ trigger: 'current' }).exec()
 
-  const checkExists = await mongoStorage.find({ 'offerData.category_list':  {$in: [secondCategory]} }).exec()
+  const checkExists = await mongoStorage.find({ 'offerData.category_list': { $in: [secondCategory] } }).exec()
 
   if (checkExists.length === 0) {
     console.log(isExists.tree[firstCategory].indexOf(secondCategory))
     isExists.tree[firstCategory].splice(isExists.tree[firstCategory].indexOf(secondCategory), 1)
     await mongoCategoryTree.updateOne(
       { trigger: 'current' },
-      { ['tree.' + firstCategory]: isExists.tree[firstCategory]}
+      { ['tree.' + firstCategory]: isExists.tree[firstCategory] }
     ).exec()
   }
 
@@ -54,13 +54,12 @@ async function deleteVoidCategoryTree (firstCategory, secondCategory) {
   }
 }
 
-function array_compare(a, b)
-{
-  if(a.length != b.length)
+function array_compare(a, b) {
+  if (a.length != b.length)
     return false
 
-  for(i = 0; i < a.length; i++)
-    if(a[i] != b[i])
+  for (i = 0; i < a.length; i++)
+    if (a[i] != b[i])
       return false
 
   return true
@@ -313,27 +312,41 @@ wsClient.on('connection', async (client, data) => {
         shop = resultArray
       }
 
-      const filterKeys = {}
-      for (const product of shop) {
-        for (const property of Object.keys(product.offerData.properties)) {
-          if (!(property in Object.keys(filterKeys))) {
-            filterKeys[property] = new Array()
-          }
+      // const filterKeys = {}
+      // for (const product of shop) {
+      //   for (const property of Object.keys(product.offerData.properties)) {
+      //     if (!(property in Object.keys(filterKeys))) {
+      //       filterKeys[property] = new Array()
+      //     }
 
-          if (!(product.offerData.properties[property] in filterKeys[property])) {
-            filterKeys[property].push(product.offerData.properties[property])
+      //     if (!(product.offerData.properties[property] in filterKeys[property])) {
+      //       filterKeys[property].push(product.offerData.properties[property])
+      //     }
+      //   }
+      // }
+
+      result_data = {}
+      for (var product of a) {
+        product_data = product['offerData']
+
+        for (const property of Object.keys(product_data['properties'])) {
+          if (!(property in Object.keys(result_data))) {
+            result_data[property] = []
+          }
+          if (!(product_data['properties'][property] in result_data[property])) {
+            result_data[property].push(product_data['properties'][property])
           }
         }
       }
 
-      const finishAnswer = {
-        filterKeys,
-        products: shop
-      }
+        const finishAnswer = {
+          filterKeys: result_data,
+          products: shop
+        }
 
-      client.send(JSON.stringify(finishAnswer))
-    }
-  })
+        client.send(JSON.stringify(finishAnswer))
+      }
+    })
   // end ws search
 
   client.on('close', () => {
