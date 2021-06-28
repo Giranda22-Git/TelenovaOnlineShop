@@ -73,9 +73,8 @@ router.get('/', async (req, res) => {
 
 // begin add new goods
 router.post('/addGoods', async (req, res) => {
-  console.log(req.body)
-  const data = JSON.parse(req.body)
-
+  const data = req.body
+  console.log(data)
   // добавление всех товаров на склад
   for (const offer of data.offers) {
     const inStock = await mongoStorage.findOne({ 'offerData.kaspi_id': offer.kaspi_id })
