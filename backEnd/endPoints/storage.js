@@ -140,10 +140,14 @@ content-type: application/json
 */
 // end delete goods by kaspi_id
 
+
+// begin get item by kaspi id
 router.get('/kaspi_id/:id', async (req, res) => {
   const result = await mongoStorage.findOne({ 'offerData.kaspi_id': req.params.id }).exec()
   res.json(result)
 })
+// end get item by kaspi id
+
 
 // begin update inStock status
 router.post('/updateInStock', async (req, res) => {
@@ -314,7 +318,7 @@ wsClient.on('connection', async (client, data) => {
   // end ws search
 
   client.on('close', () => {
-    clients.delete(newClient)
+    wsClients.delete(newClient)
     console.log(`deleted: ${newClient.phoneNumber}`)
   })
 })
