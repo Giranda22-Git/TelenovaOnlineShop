@@ -73,7 +73,7 @@ router.get('/', async (req, res) => {
 
 // begin add new goods
 router.post('/addGoods', async (req, res) => {
-  console.log(req.data)
+  console.log(req.body)
   const data = JSON.parse(req.body)
 
   // добавление всех товаров на склад
