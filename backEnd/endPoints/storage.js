@@ -325,9 +325,11 @@ wsClient.on('connection', async (client, data) => {
         }
       }
 
-      filterKeys.filter(key => {
-        return key.length !== 1
-      })
+      for (const key in filterKeys) {
+        if (filterKeys[key].length === 1) {
+          delete filterKeys[key]
+        }
+      }
 
       const finishAnswer = {
         filterKeys,
