@@ -333,9 +333,7 @@ wsClient.on('connection', async (client, data) => {
           if (!(property in Object.keys(result_data))) {
             result_data[property] = []
           }
-          if (!(product_data['properties'][property] in result_data[property])) {
-            result_data[property].push(product_data['properties'][property])
-          }
+          result_data[property].push(product_data['properties'][property])
         }
       }
 
