@@ -312,39 +312,27 @@ wsClient.on('connection', async (client, data) => {
         shop = resultArray
       }
 
-      // const filterKeys = {}
-      // for (const product of shop) {
-      //   for (const property of Object.keys(product.offerData.properties)) {
-      //     if (!(property in Object.keys(filterKeys))) {
-      //       filterKeys[property] = new Array()
-      //     }
-
-      //     if (!(product.offerData.properties[property] in filterKeys[property])) {
-      //       filterKeys[property].push(product.offerData.properties[property])
-      //     }
-      //   }
-      // }
-
-      result_data = {}
-      for (var product of shop) {
-        product_data = product['offerData']
-
-        for (const property of Object.keys(product_data['properties'])) {
-          if (!(property in Object.keys(result_data))) {
-            result_data[property] = []
+      const filterKeys = {}
+      for (const product of shop) {
+        for (const property of Object.keys(product.offerData.properties)) {
+          if (Object.keys(filterKeys).includes(property)) {
+            filterKeys[property] = new Array()
           }
-          result_data[property].push(product_data['properties'][property])
+
+          if (filterKeys[property].includes(product.offerData.properties[property])) {
+            filterKeys[property].push(product.offerData.properties[property])
+          }
         }
       }
 
-        const finishAnswer = {
-          filterKeys: result_data,
-          products: shop
-        }
-
-        client.send(JSON.stringify(finishAnswer))
+      const finishAnswer = {
+        filterKeys: result_data,
+        products: shop
       }
-    })
+
+      client.send(JSON.stringify(finishAnswer))
+    }
+  })
   // end ws search
 
   client.on('close', () => {
