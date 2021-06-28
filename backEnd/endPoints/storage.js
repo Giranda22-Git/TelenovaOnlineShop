@@ -312,7 +312,26 @@ wsClient.on('connection', async (client, data) => {
         })
         shop = resultArray
       }
-      client.send(JSON.stringify(shop))
+
+      const filterKeys = {}
+      for (const product of shop) {
+        for (const property of Object.keys(product.offerData.properties)) {
+          if (!(property in Object.keys(filterKeys))) {
+            filterKeys[property] = new Array()
+          }
+
+          if (!(product.offerData.properties[property] in filterKeys[property])) {
+            filterKeys[property].push(product.offerData.properties[property])
+          }
+        }
+      }
+
+      const finishAnswer = {
+        filterKeys,
+        products: shop
+      }
+
+      client.send(JSON.stringify(finishAnswer))
     }
   })
   // end ws search
