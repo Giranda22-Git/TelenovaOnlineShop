@@ -74,7 +74,7 @@ router.get('/', async (req, res) => {
 // begin add new goods
 router.post('/addGoods', async (req, res) => {
   const data = req.body
-
+  console.log(data)
   // добавление всех товаров на склад
   for (const offer of data.offers) {
     const inStock = await mongoStorage.findOne({ 'offerData.kaspi_id': offer.kaspi_id })
@@ -127,13 +127,14 @@ router.post('/deleteGoods', async (req, res) => {
 /*
 TEST:
 
-POST http://localhost:3001/storage/deleteGoods HTTP/1.1
+POST http://157.230.225.244/storage/deleteGoods HTTP/1.1
 content-type: application/json
 
 {
   "deleteArray": [
+    "100098508",
     "100098506",
-    "100098508"
+    "100098507"
   ]
 }
 */
