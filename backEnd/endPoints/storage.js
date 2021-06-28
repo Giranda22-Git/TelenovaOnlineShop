@@ -320,7 +320,7 @@ wsClient.on('connection', async (client, data) => {
             filterKeys[property] = new Array()
           }
 
-          if (!(product.offerData.properties[property] in filterKeys[property])) {
+          if (!filterKeys[property].includes(product.offerData.properties[property])) {
             filterKeys[property].push(product.offerData.properties[property])
           }
         }
