@@ -325,6 +325,10 @@ wsClient.on('connection', async (client, data) => {
         }
       }
 
+      filterKeys.filter(key => {
+        return key.length !== 1
+      })
+
       const finishAnswer = {
         filterKeys,
         products: shop
