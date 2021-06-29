@@ -145,11 +145,11 @@ router.post('/deleteAllGoods', async (req, res) => {
 })
 /*
 TEST:
-POST http://localhost:3001/storage/deleteAllGoods HTTP/1.1
+POST http://157.230.225.244/storage/deleteAllGoods HTTP/1.1
 content-type: application/json
 */
 // end delete all goods
-
+  
 
 // begin delete goods by kaspi_id
 
