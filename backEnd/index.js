@@ -3,7 +3,10 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 
-const serverData = require('./staticData/mountedData.js')
+const serverData = require('./staticData/mountedData.js').data
+const mountedCreateNewCategoryTree = require('./staticData/mountedData.js').mountedCreateNewCategoryTree
+
+mountedCreateNewCategoryTree()
 
 const app = express()
 

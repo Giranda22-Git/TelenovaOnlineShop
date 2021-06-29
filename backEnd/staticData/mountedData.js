@@ -4,4 +4,14 @@ const data = {
 	PORT: 3001
 }
 
-module.exports = data
+const mongoCategoryTree = require('../models/CategoryTree.js').mongoCategoryTree
+
+async function mountedCreateNewCategoryTree () {
+  const forGenerateNewCategoryTree = await mongoCategoryTree.find({ trigger: 'current' }).exec()
+  if (forGenerateNewCategoryTree.length !== 1) {
+    const newTree = new mongoCategoryTree({})
+    await newTree.save()
+  }
+}
+
+module.exports = {data, mountedCreateNewCategoryTree}

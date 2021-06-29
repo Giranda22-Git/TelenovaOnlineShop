@@ -7,13 +7,13 @@ const wsClients = new Set()
 const mongoStorage = require('../models/Storage.js').mongoStorage
 const mongoCategoryTree = require('../models/CategoryTree.js').mongoCategoryTree
 
-async function addFirstLevelCategoryTree(category) {
+async function addFirstLevelCategoryTree(firstCategory) {
   const isExists = await mongoCategoryTree.findOne({ trigger: 'current' })
 
-  if (!isExists.tree.hasOwnProperty(category)) {
+  if (!isExists.tree.hasOwnProperty(firstCategory)) {
     await mongoCategoryTree.updateOne(
       { trigger: 'current' },
-      { $set: { ['tree.' + category]: new Array() } }
+      { $set: { ['tree.' + firstCategory]: new Object() } }
     )
   }
 }
@@ -21,36 +21,52 @@ async function addFirstLevelCategoryTree(category) {
 async function addSecondLevelCategoryTree(firstCategory, secondCategory) {
   const isExists = await mongoCategoryTree.findOne({ trigger: 'current' })
 
-  if (!isExists.tree[firstCategory].includes(secondCategory)) {
+  if (!(Object.keys(isExists.tree[firstCategory]).includes(secondCategory))) {
     await mongoCategoryTree.updateOne(
       { trigger: 'current' },
-      { $push: { ['tree.' + firstCategory]: secondCategory } }
+      { $set: { [`tree.${firstCategory}.${secondCategory}`]: new Array() } }
     ).exec()
   }
 }
 
-async function deleteVoidCategoryTree(firstCategory, secondCategory) {
-  let isExists = await mongoCategoryTree.findOne({ trigger: 'current' }).exec()
+async function addThirdLevelCategoryTree(firstCategory, secondCategory, thirdCategory) {
+  const isExists = await mongoCategoryTree.findOne({ trigger: 'current' })
 
-  const checkExists = await mongoStorage.find({ 'offerData.category_list': { $in: [secondCategory] } }).exec()
-
-  if (checkExists.length === 0) {
-    console.log(isExists.tree[firstCategory].indexOf(secondCategory))
-    isExists.tree[firstCategory].splice(isExists.tree[firstCategory].indexOf(secondCategory), 1)
+  if (!isExists.tree[firstCategory][secondCategory].includes(thirdCategory)) {
     await mongoCategoryTree.updateOne(
       { trigger: 'current' },
-      { ['tree.' + firstCategory]: isExists.tree[firstCategory] }
+      { $push: { [`tree.${firstCategory}.${secondCategory}`]: thirdCategory } }
+    ).exec()
+  }
+}
+
+async function deleteVoidCategoryTree(firstCategory, secondCategory, thirdCategory) {
+  let isExists = await mongoCategoryTree.findOne({ trigger: 'current' }).exec()
+
+  const checkExists = await mongoStorage.find({ 'offerData.category_list': { $in: [thirdCategory] } }).exec()
+
+  if (checkExists.length === 0) {
+    isExists.tree[firstCategory][secondCategory].splice(isExists.tree[firstCategory][secondCategory].indexOf(thirdCategory), 1)
+    await mongoCategoryTree.updateOne(
+      { trigger: 'current' },
+      { [`tree.${firstCategory}.${secondCategory}`]: isExists.tree[firstCategory][secondCategory] }
     ).exec()
   }
 
   isExists = await mongoCategoryTree.findOne({ trigger: 'current' }).exec()
+  if (isExists.tree[firstCategory][secondCategory].length === 0) {
+    await mongoCategoryTree.updateOne(
+      { trigger: 'current' },
+      { $unset: { [`tree.${firstCategory}.${secondCategory}`]: '' } }
+    ).exec()
+  }
 
-  if (isExists.tree[firstCategory].length === 0) {
-    console.log('firstsLevel')
+  isExists = await mongoCategoryTree.findOne({ trigger: 'current' }).exec()
+  if (Object.keys(isExists.tree[firstCategory]).length === 0) {
     await mongoCategoryTree.updateOne(
       { trigger: 'current' },
       { $unset: { ['tree.' + firstCategory]: '' } }
-    )
+    ).exec()
   }
 }
 
@@ -81,7 +97,7 @@ router.post('/addGoods', async (req, res) => {
       await mongoStorage.deleteOne({ 'offerData.kaspi_id': offer.kaspi_id })
       if (!array_compare(inStock.offerData.category_list, offer.category_list)) {
         // удаление категорий в случае их изменения
-        deleteVoidCategoryTree(inStock.offerData.category_list[0], inStock.offerData.category_list[1])
+        deleteVoidCategoryTree(inStock.offerData.category_list[0], inStock.offerData.category_list[1], inStock.offerData.category_list[2])
       }
     }
 
@@ -96,6 +112,9 @@ router.post('/addGoods', async (req, res) => {
 
     // добавление категории второго уровня
     await addSecondLevelCategoryTree(offer.category_list[0], offer.category_list[1])
+
+    // добавление категории третьего уровня
+    await addThirdLevelCategoryTree(offer.category_list[0], offer.category_list[1], offer.category_list[2])
   }
 
   res.sendStatus(200)
@@ -110,6 +129,28 @@ content-type: application/json
 // end add new goods
 
 
+// begin delete all goods
+
+router.post('/deleteAllGoods', async (req, res) => {
+  const allGoods = await mongoStorage.find()
+
+  for (const item of allGoods) {
+    await mongoStorage.deleteOne({ 'offerData.kaspi_id': item.offerData.kaspi_id })
+    await deleteVoidCategoryTree(item.offerData.category_list[0], item.offerData.category_list[1], item.offerData.category_list[2])
+  }
+
+  console.log('all goods succefull deleted')
+
+  res.sendStatus(200)
+})
+/*
+TEST:
+POST http://localhost:3001/storage/deleteAllGoods HTTP/1.1
+content-type: application/json
+*/
+// end delete all goods
+
+
 // begin delete goods by kaspi_id
 
 router.post('/deleteGoods', async (req, res) => {
@@ -118,7 +159,7 @@ router.post('/deleteGoods', async (req, res) => {
   for (const kaspi_id of data.deleteArray) {
     const tmp = await mongoStorage.findOne({ 'offerData.kaspi_id': kaspi_id })
     await mongoStorage.deleteOne({ 'offerData.kaspi_id': kaspi_id })
-    await deleteVoidCategoryTree(tmp.offerData.category_list[0], tmp.offerData.category_list[1])
+    await deleteVoidCategoryTree(tmp.offerData.category_list[0], tmp.offerData.category_list[1], tmp.offerData.category_list[2])
   }
 
   res.sendStatus(200)
@@ -126,14 +167,12 @@ router.post('/deleteGoods', async (req, res) => {
 /*
 TEST:
 
-POST http://157.230.225.244/storage/deleteGoods HTTP/1.1
+POST http://localhost:3001/storage/deleteGoods HTTP/1.1
 content-type: application/json
 
 {
   "deleteArray": [
-    "100098508",
-    "100098506",
-    "100098507"
+    "100098508"
   ]
 }
 */
@@ -236,6 +275,11 @@ wsClient.on('connection', async (client, data) => {
           else if (key === "secondLevelCategory") {
             shop = shop.filter(element => {
               return element.offerData.category_list[1] === data.filters[key]
+            })
+          }
+          else if (key === "thirdLevelCategory") {
+            shop = shop.filter(element => {
+              return element.offerData.category_list[2] === data.filters[key]
             })
           }
           else if (key === "priceRange") {
@@ -357,6 +401,7 @@ content-type: application/json
   "filters": {
     "firstLevelCategory": "Аудиотехника",
     "secondLevelCategory": "Портативные колонки",
+    "secondLevelCategory": 'Колонки"
     "priceRange": [500, 10000],
     "switchers": [
       {
