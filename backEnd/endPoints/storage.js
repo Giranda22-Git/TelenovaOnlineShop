@@ -149,7 +149,7 @@ POST http://157.230.225.244/storage/deleteAllGoods HTTP/1.1
 content-type: application/json
 */
 // end delete all goods
-  
+
 
 // begin delete goods by kaspi_id
 
@@ -401,7 +401,7 @@ content-type: application/json
   "filters": {
     "firstLevelCategory": "Аудиотехника",
     "secondLevelCategory": "Портативные колонки",
-    "secondLevelCategory": 'Колонки"
+    "thirdLevelCategory": "Колонки"
     "priceRange": [500, 10000],
     "switchers": [
       {
