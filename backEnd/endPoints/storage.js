@@ -338,20 +338,9 @@ wsClient.on('connection', async (client, data) => {
         }
       }
       if (data.query) {
-        const queryArray = data.query.split('')
         const resultArray = new Array()
         shop.forEach(product => {
-          let coincidence = 0
-          queryArray.forEach(symbol => {
-            if (product.offerData.name.includes(symbol))
-              coincidence++
-          })
-
-          const result = (coincidence / queryArray.length) * 100
-          console.log(product.offerData.name, queryArray, result)
-
-          if (result >= 80)
-            resultArray.push(product)
+          if (product.offerData.name.includes(data.query)) resultArray.push(product)
         })
         shop = resultArray
       }
