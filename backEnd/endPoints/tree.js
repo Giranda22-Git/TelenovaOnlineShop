@@ -19,11 +19,9 @@ router.get('/', async (req, res) => {
 
 
 router.get('/download/:filename', async (req, res) => {
-  const product = await mongoCategoryList.findOne({ 'image.fileName': req.params.filename }).exec()
+  const product = await mongoCategoryList.findOne({ name: req.params.filename }).exec()
 
-  if (product.image.fileName === req.params.filename) {
-    res.sendFile(`${tmpDir}${product.image.fileName}`)
-  }
+  res.sendFile(`${tmpDir}${product.image.fileName}`)
 })
 /*
 TEST:
