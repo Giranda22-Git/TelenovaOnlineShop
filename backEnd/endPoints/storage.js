@@ -6,6 +6,7 @@ const wsClients = new Set()
 
 const mongoStorage = require('../models/Storage.js').mongoStorage
 const mongoCategoryTree = require('../models/CategoryTree.js').mongoCategoryTree
+const mongoCategoryList = require('../models/CategoryList.js').mongoCategoryList
 
 async function addFirstLevelCategoryTree(firstCategory) {
   const isExists = await mongoCategoryTree.findOne({ trigger: 'current' })
@@ -70,6 +71,22 @@ async function deleteVoidCategoryTree(firstCategory, secondCategory, thirdCatego
   }
 }
 
+async function addCategoryList(firstCategory, secondCategory, thirdCategory) {
+  const newList = [ firstCategory, secondCategory, thirdCategory ]
+
+  for (const [index, category] of newList.entries()) {
+    const isExist = await mongoCategoryList.findOne({ name: category }).exec()
+
+    if (!isExist) {
+      const newCategory = mongoCategoryList({
+        name: category,
+        level: index + 1
+      })
+      await newCategory.save()
+    }
+  }
+}
+
 function array_compare(a, b) {
   if (a.length != b.length)
     return false
@@ -94,18 +111,18 @@ router.post('/addGoods', async (req, res) => {
   for (const offer of data.offers) {
     const inStock = await mongoStorage.findOne({ 'offerData.kaspi_id': offer.kaspi_id })
     if (inStock) {
-      await mongoStorage.deleteOne({ 'offerData.kaspi_id': offer.kaspi_id })
+      await mongoStorage.updateOne({ 'offerData.kaspi_id': offer.kaspi_id }, { offerData: offer })
       if (!array_compare(inStock.offerData.category_list, offer.category_list)) {
         // удаление категорий в случае их изменения
         deleteVoidCategoryTree(inStock.offerData.category_list[0], inStock.offerData.category_list[1], inStock.offerData.category_list[2])
       }
+    } else {
+      const tmp = new mongoStorage({
+        offerData: offer,
+        dateOfCreature: new Date()
+      })
+      await tmp.save()
     }
-
-    const tmp = new mongoStorage({
-      offerData: offer,
-      dateOfCreature: new Date()
-    })
-    await tmp.save()
 
     // добавление категории первого уровня
     await addFirstLevelCategoryTree(offer.category_list[0])
@@ -115,6 +132,9 @@ router.post('/addGoods', async (req, res) => {
 
     // добавление категории третьего уровня
     await addThirdLevelCategoryTree(offer.category_list[0], offer.category_list[1], offer.category_list[2])
+
+    // добавление категорий в лист категорий
+    await addCategoryList(offer.category_list[0], offer.category_list[1], offer.category_list[2])
   }
 
   res.sendStatus(200)
@@ -145,7 +165,7 @@ router.post('/deleteAllGoods', async (req, res) => {
 })
 /*
 TEST:
-POST http://157.230.225.244/storage/deleteAllGoods HTTP/1.1
+POST http://localhost:3001/storage/deleteAllGoods HTTP/1.1
 content-type: application/json
 */
 // end delete all goods
@@ -179,8 +199,156 @@ content-type: application/json
 // end delete goods by kaspi_id
 
 
+// begin get most popular prodcuts
+
+router.get('/mostPopular/products/:count', async (req, res) => {
+  let allProducts = await mongoStorage.find().exec()
+
+  allProducts.sort(function (a, b) {
+    if (a.countOfSold > b.countOfSold) {
+      return -1
+    }
+    if (a.countOfSold < b.countOfSold) {
+      return 1
+    }
+    return 0
+  })
+
+  allProducts = allProducts.slice(0, req.params.count)
+
+  res.json(allProducts)
+})
+/*
+TEST:
+
+GET http://localhost:3001/storage/mostPopular/products/2 HTTP/1.1
+content-type: application/json
+*/
+// end get most popular prodcuts
+
+
+// begin get most popular first level categories
+
+router.get('/mostPopular/firstLevelCategories/:count', async (req, res) => {
+  let categoryList = await mongoCategoryList.find({ level: 1 }).exec()
+
+  categoryList.sort(function (a, b) {
+    if (a.countOfSold > b.countOfSold) {
+      return -1
+    }
+    if (a.countOfSold < b.countOfSold) {
+      return 1
+    }
+    return 0
+  })
+
+  categoryList = categoryList.slice(0, req.params.count)
+
+  res.json(categoryList)
+})
+/*
+TEST:
+
+GET http://localhost:3001/storage/mostPopular/firstLevelCategories/4 HTTP/1.1
+content-type: application/json
+*/
+// end get most popular first level categories
+
+
+// begin get most popular second level categories
+
+router.get('/mostPopular/secondLevelCategories/:count', async (req, res) => {
+  let categoryList = await mongoCategoryList.find({ level: 2 }).exec()
+
+  categoryList.sort(function (a, b) {
+    if (a.countOfSold > b.countOfSold) {
+      return -1
+    }
+    if (a.countOfSold < b.countOfSold) {
+      return 1
+    }
+    return 0
+  })
+
+  categoryList = categoryList.slice(0, req.params.count)
+
+  res.json(categoryList)
+})
+/*
+TEST:
+
+GET http://localhost:3001/storage/mostPopular/secondLevelCategories/4 HTTP/1.1
+content-type: application/json
+*/
+// end get most popular second level categories
+
+
+// begin get most popular third level categories
+
+router.get('/mostPopular/thirdLevelCategories/:count', async (req, res) => {
+  let categoryList = await mongoCategoryList.find({ level: 3 }).exec()
+
+  categoryList.sort(function (a, b) {
+    if (a.countOfSold > b.countOfSold) {
+      return -1
+    }
+    if (a.countOfSold < b.countOfSold) {
+      return 1
+    }
+    return 0
+  })
+
+  categoryList = categoryList.slice(0, req.params.count)
+
+  res.json(categoryList)
+})
+/*
+TEST:
+
+GET http://localhost:3001/storage/mostPopular/thirdLevelCategories/40 HTTP/1.1
+content-type: application/json
+*/
+// end get most popular third level categories
+
+
+// begin get new prodcuts
+
+router.get('/mostPopular/freshProducts/:count', async (req, res) => {
+  let allProducts = await mongoStorage.find().exec()
+
+  allProducts.sort(function (a, b) {
+    if (a.dateOfCreature < b.dateOfCreature) {
+      return -1
+    }
+    if (a.dateOfCreature > b.dateOfCreature) {
+      return 1
+    }
+    return 0
+  })
+
+  allProducts = allProducts.slice(0, req.params.count)
+
+  res.json(allProducts)
+})
+/*
+TEST:
+
+GET http://localhost:3001/storage/mostPopular/freshProducts/4 HTTP/1.1
+content-type: application/json
+*/
+// end get new prodcuts
+
+
 // begin get item by kaspi id
 router.get('/kaspi_id/:id', async (req, res) => {
+  const targetProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': req.params.id }).exec()
+  const similarProducts = []
+
+  for (const product of targetProduct.similarProductsId) {
+    const tmp = await mongoStorage.findOne({ 'offerData.kaspi_id': product }).exec()
+    similarProducts.push(tmp)
+  }
+  await mongoStorage.updateOne({ 'offerData.kaspi_id': req.params.id }, { similarProducts: similarProducts }).exec()
   const result = await mongoStorage.findOne({ 'offerData.kaspi_id': req.params.id }).exec()
   res.json(result)
 })
@@ -231,7 +399,14 @@ content-type: application/json
 
 router.get('/getAllCategories', async (req, res) => {
   const tree = await mongoCategoryTree.findOne({ trigger: 'current' }).exec()
-  res.status(200).json(tree)
+  const resultArray = new Array()
+  for (const key in tree.tree) {
+    const tmp = {
+      [key]: tree.tree[key]
+    }
+    resultArray.push(tmp)
+  }
+  res.status(200).json(resultArray)
 })
 
 /*
@@ -242,6 +417,62 @@ content-type: application/json
 */
 
 // end get all categories
+
+
+// begin add similar goods on product
+router.post('/addSimilarGoods', async (req, res) => {
+  const data = req.body
+
+  const targetProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': data.kaspi_id }).exec()
+  const resultSimilarProducts = []
+
+  data.similarProductsId.forEach(product => {
+    if (
+      !(targetProduct.similarProductsId.includes(product)) &&
+      !(resultSimilarProducts.includes(product))
+    ) {
+      resultSimilarProducts.push(product)
+    }
+  })
+
+  await mongoStorage.updateOne({ 'offerData.kaspi_id': data.kaspi_id }, { $push: { similarProductsId: resultSimilarProducts } }).exec()
+  res.sendStatus(200)
+})
+/*
+POST http://localhost:3001/storage/addSimilarGoods HTTP/1.1
+content-type: application/json
+
+{
+  "kaspi_id": "100098508",
+  "similarProductsId": [
+    "100098506",
+    "100098507"
+  ]
+}
+*/
+// end add similar goods on product
+
+
+// begin remove similar goods
+router.post('/removeSimilarGoods', async (req, res) => {
+  const data = req.body
+
+  await mongoStorage.updateOne({ 'offerData.kaspi_id': data.kaspi_id }, { $pull: { similarProductsId: { $in: data.similarProductsId } } }).exec()
+  res.sendStatus(200)
+})
+/*
+POST http://localhost:3001/storage/removeSimilarGoods HTTP/1.1
+content-type: application/json
+
+{
+  "kaspi_id": "100098508",
+  "similarProductsId": [
+    "100098506",
+    "100098507"
+  ]
+}
+*/
+// end remove similar goods
 
 
 // begin WebSocket Client connection

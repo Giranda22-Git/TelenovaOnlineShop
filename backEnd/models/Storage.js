@@ -16,6 +16,22 @@ const good = new mongoose.Schema({
   inStock: {
     type: Boolean,
     default: true
+  },
+  countOfSold: {
+    type: Number,
+    default: 0
+  },
+  similarProductsId: {
+    type: [String],
+    default: []
+  },
+  similarProducts: {
+    type: [],
+    default: []
+  },
+  sale: {
+    type: Number,
+    default: 0
   }
 })
 
