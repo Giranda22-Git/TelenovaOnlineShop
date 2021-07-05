@@ -8,7 +8,7 @@ const mongoCategoryList = require('../models/CategoryList.js').mongoCategoryList
 const serverData = require('../staticData/mountedData.js').data
 
 const tmpDir = __dirname + '/categoryImages/'
-const upload = multer({ dest: './endPoints/categoryImages/' })
+const upload = multer({ dest: __dirname +  './endPoints/categoryImages/' })
 
 
 // begin get file by filename
