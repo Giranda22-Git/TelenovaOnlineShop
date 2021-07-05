@@ -47,6 +47,7 @@ async function deleteVoidCategoryTree(firstCategory, secondCategory, thirdCatego
   const checkExists = await mongoStorage.find({ 'offerData.category_list': { $in: [thirdCategory] } }).exec()
 
   if (checkExists.length === 0) {
+    console.log('third', thirdCategory)
     isExists.tree[firstCategory][secondCategory].splice(isExists.tree[firstCategory][secondCategory].indexOf(thirdCategory), 1)
     await mongoCategoryTree.updateOne(
       { trigger: 'current' },
@@ -56,6 +57,7 @@ async function deleteVoidCategoryTree(firstCategory, secondCategory, thirdCatego
 
   isExists = await mongoCategoryTree.findOne({ trigger: 'current' }).exec()
   if (isExists.tree[firstCategory][secondCategory].length === 0) {
+    console.log('second', secondCategory)
     await mongoCategoryTree.updateOne(
       { trigger: 'current' },
       { $unset: { [`tree.${firstCategory}.${secondCategory}`]: '' } }
@@ -64,6 +66,7 @@ async function deleteVoidCategoryTree(firstCategory, secondCategory, thirdCatego
 
   isExists = await mongoCategoryTree.findOne({ trigger: 'current' }).exec()
   if (Object.keys(isExists.tree[firstCategory]).length === 0) {
+    console.log('first', firstCategory)
     await mongoCategoryTree.updateOne(
       { trigger: 'current' },
       { $unset: { ['tree.' + firstCategory]: '' } }
