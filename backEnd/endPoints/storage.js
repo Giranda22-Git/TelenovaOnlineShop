@@ -46,6 +46,7 @@ async function deleteVoidCategoryTree(firstCategory, secondCategory, thirdCatego
 
   const checkExists = await mongoStorage.find({ 'offerData.category_list': { $in: [thirdCategory] } }).exec()
 
+  console.log(firstCategory, secondCategory, thirdCategory)
   if (checkExists.length === 0) {
     console.log('third', thirdCategory)
     isExists.tree[firstCategory][secondCategory].splice(isExists.tree[firstCategory][secondCategory].indexOf(thirdCategory), 1)
