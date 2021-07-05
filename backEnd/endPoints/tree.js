@@ -89,7 +89,7 @@ router.post('/addImage', upload.single('file'), async (req, res) => {
         fs.renameSync(tmpDir + file.filename, tmpDir + newFileName)
 
         image = {
-          clientPath: `${serverData.serverUrl}categoryTree/download/${newFileName}`,
+          clientPath: `${serverData.interiorServerUrl}categoryTree/download/${newFileName}`,
           fileName: newFileName
         }
       } else {

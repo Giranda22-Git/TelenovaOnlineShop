@@ -1,6 +1,7 @@
 const data = {
   mongoUrl: 'mongodb://localhost:27017/TelenovaOnlineShop',
 	serverUrl: 'http://localhost:3001/',
+  interiorServerUrl: 'http://157.230.225.244/',
 	PORT: 3001
 }
 
