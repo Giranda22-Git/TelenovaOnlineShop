@@ -479,6 +479,48 @@ content-type: application/json
 // end remove similar goods
 
 
+// begin get goods by category name
+
+router.post('/filter/categories', async (req, res) => {
+  const data = req.body
+
+  let allGoods = await mongoStorage.find().exec()
+
+  for (const key in data.categories) {
+    if (key === 'firstLevelCategory') {
+      allGoods = allGoods.filter(product => {
+        return product.offerData.category_list[0] === data.categories[key]
+      })
+    }
+    else if (key === 'secondLevelCategory') {
+      allGoods = allGoods.filter(product => {
+        return product.offerData.category_list[1] === data.categories[key]
+      })
+    }
+    else if (key === 'thirdLevelCategory') {
+      allGoods = allGoods.filter(product => {
+        return product.offerData.category_list[2] === data.categories[key]
+      })
+    }
+  }
+
+  res.json(allGoods)
+})//ТВ, Аудио, Видео
+
+/*
+POST http://localhost:3001/storage/filter/categories HTTP/1.1
+content-type: application/json
+
+{
+  "categories": {
+    "thirdLevelCategory": "Объективы 6"
+  }
+}
+*/
+
+// end get goods by category name
+
+
 // begin WebSocket Client connection
 wsClient.on('connection', async (client, data) => {
   const newClient = {

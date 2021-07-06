@@ -16,7 +16,7 @@ const list = new mongoose.Schema({
   },
   image: {
     type: Object,
-    default: {}
+    default: { clientPath: 'https://resources.workable.com/wp-content/uploads/2016/01/category-manager-640x230.jpg' }
   }
 })
 
