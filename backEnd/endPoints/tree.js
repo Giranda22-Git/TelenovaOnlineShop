@@ -2,6 +2,8 @@ const router = require('express').Router()
 const multer = require('multer')
 const fs = require('fs')
 
+const axios = require('axios')
+
 const mongoCategoryTree = require('../models/CategoryTree.js').mongoCategoryTree
 const mongoCategoryList = require('../models/CategoryList.js').mongoCategoryList
 
@@ -19,9 +21,15 @@ router.get('/', async (req, res) => {
 
 
 router.get('/download/:filename', async (req, res) => {
+  console.log(req.params.filename)
   const product = await mongoCategoryList.findOne({ name: req.params.filename }).exec()
-
-  res.sendFile(`${tmpDir}${product.image.fileName}`)
+  console.log(product)
+  if (product.image.fileName)
+    res.sendFile(`${tmpDir}${product.image.fileName}`)
+  else {
+    const result = await axios.get(product.image.clientPath)
+    res.send(result.data)
+  }
 })
 /*
 TEST:
