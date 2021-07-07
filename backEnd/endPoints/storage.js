@@ -646,11 +646,11 @@ wsClient.on('connection', async (client, data) => {
         }
       }
 
-      for (const key in filterKeys) {
-        if (filterKeys[key].length === 1) {
-          delete filterKeys[key]
-        }
-      }
+      // for (const key in filterKeys) {
+      //   if (filterKeys[key].length === 1) {
+      //     delete filterKeys[key]
+      //   }
+      // }
 
       const finishAnswer = {
         filterKeys,
