@@ -21,14 +21,11 @@ router.get('/', async (req, res) => {
 
 
 router.get('/download/:filename', async (req, res) => {
-  console.log(req.params.filename)
   const product = await mongoCategoryList.findOne({ name: req.params.filename }).exec()
-  console.log(product)
-  if (product.image.fileName)
+  if (product.image.fileName) {
     res.sendFile(`${tmpDir}${product.image.fileName}`)
-  else {
-    const result = await axios.get(product.image.clientPath)
-    res.send(result.data)
+  } else {
+    res.sendFile(`${tmpDir}stockCategoryImg.jpeg`)
   }
 })
 /*
