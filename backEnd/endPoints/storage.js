@@ -357,6 +357,23 @@ router.get('/kaspi_id/:id', async (req, res) => {
 // end get item by kaspi id
 
 
+// begin delete all similar products
+
+router.get('/removeAllSimilarPoducts', async (req, res) => {
+  const allProducts = await mongoStorage.find().exec()
+
+  for (const product of allProducts) {
+    const result = await mongoStorage.updateOne({ _id: product._id }, { similarProducts: new Array() }).exec()
+    console.log(result)
+  }
+
+  const resultProducts = await mongoStorage.find().exec()
+  res.json(resultProducts)
+})
+
+// end delete all similar poducts
+
+
 // begin update inStock status
 router.post('/updateInStock', async (req, res) => {
   const data = req.body
