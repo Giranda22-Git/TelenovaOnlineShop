@@ -331,7 +331,6 @@ router.get('/mostPopular/freshProducts/:count', async (req, res) => {
   })
 
   allProducts = allProducts.slice(0, req.params.count)
-  console.log(allProducts.length, req.params.count)
   res.json(allProducts)
 })
 /*
@@ -352,9 +351,8 @@ router.get('/kaspi_id/:id', async (req, res) => {
     const tmp = await mongoStorage.findOne({ 'offerData.kaspi_id': product }).exec()
     similarProducts.push(tmp)
   }
-  await mongoStorage.updateOne({ 'offerData.kaspi_id': req.params.id }, { similarProducts: similarProducts }).exec()
-  const result = await mongoStorage.findOne({ 'offerData.kaspi_id': req.params.id }).exec()
-  res.json(result)
+  targetProduct.similarProducts = similarProducts
+  res.json(targetProduct)
 })
 // end get item by kaspi id
 
