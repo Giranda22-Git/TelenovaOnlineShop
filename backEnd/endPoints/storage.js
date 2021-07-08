@@ -331,7 +331,7 @@ router.get('/mostPopular/freshProducts/:count', async (req, res) => {
   })
 
   allProducts = allProducts.slice(0, req.params.count)
-
+  console.log(allProducts.length, req.params.count)
   res.json(allProducts)
 })
 /*
