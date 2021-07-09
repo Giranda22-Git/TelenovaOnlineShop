@@ -667,7 +667,18 @@ wsClient.on('connection', async (client, data) => {
       //   }
       // }
 
+      shop.sort(function (a, b) {
+        if (a.offerData.price < b.offerData.price) {
+          return -1
+        }
+        if (a.offerData.price > b.offerData.price) {
+          return 1
+        }
+        return 0
+      })
+
       const finishAnswer = {
+        priceRange: [shop[shop.length - 1].offerData.price, shop[0].offerData.price],
         filterKeys,
         products: shop
       }
