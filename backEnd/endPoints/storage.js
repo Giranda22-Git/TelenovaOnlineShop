@@ -648,6 +648,8 @@ wsClient.on('connection', async (client, data) => {
         shop = resultArray
       }
 
+      if (shop.length === 0) res.json({ priceRange: [0,0], filterKeys: [], products: [] })
+
       const filterKeys = {}
       for (const product of shop) {
         for (const property of Object.keys(product.offerData.properties)) {
