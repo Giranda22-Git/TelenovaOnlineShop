@@ -676,7 +676,7 @@ wsClient.on('connection', async (client, data) => {
         }
         return 0
       })
-
+      console.log(shop)
       const finishAnswer = {
         priceRange: [shop[shop.length - 1].offerData.price, shop[0].offerData.price],
         filterKeys,
