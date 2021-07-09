@@ -650,8 +650,28 @@ wsClient.on('connection', async (client, data) => {
 
       if (shop.length === 0) client.send(JSON.stringify({ priceRange: [0,0], filterKeys: [], products: [] }))
 
+      let allProducts = await mongoStorage.find().exec()
+
+      for (const key in data.filters) {
+        if (key === "firstLevelCategory") {
+          allProducts = allProducts.filter(element => {
+            return element.offerData.category_list[0] === data.filters[key]
+          })
+        }
+        else if (key === "secondLevelCategory") {
+          allProducts = allProducts.filter(element => {
+            return element.offerData.category_list[1] === data.filters[key]
+          })
+        }
+        else if (key === "thirdLevelCategory") {
+          allProducts = allProducts.filter(element => {
+            return element.offerData.category_list[2] === data.filters[key]
+          })
+        }
+      }
+
       const filterKeys = {}
-      for (const product of shop) {
+      for (const product of allProducts) {
         for (const property of Object.keys(product.offerData.properties)) {
           if (!(Object.keys(filterKeys).includes(property))) {
             filterKeys[property] = new Array()
@@ -669,7 +689,7 @@ wsClient.on('connection', async (client, data) => {
       //   }
       // }
 
-      shop.sort(function (a, b) {
+      allProducts.sort(function (a, b) {
         if (a.offerData.price < b.offerData.price) {
           return -1
         }
@@ -680,7 +700,7 @@ wsClient.on('connection', async (client, data) => {
       })
       console.log(shop)
       const finishAnswer = {
-        priceRange: [shop[0].offerData.price, shop[shop.length - 1].offerData.price],
+        priceRange: [allProducts[0].offerData.price, allProducts[allProducts.length - 1].offerData.price],
         filterKeys,
         products: shop
       }
