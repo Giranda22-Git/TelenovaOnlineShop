@@ -540,7 +540,7 @@ content-type: application/json
 
 router.post('/getGoods/categories', async (req, res) => {
   const data = req.body
-  const shop = await mongoStorage.find().exec()
+  let shop = await mongoStorage.find().exec()
   for (const key in data) {
     if (key === 'firstLevelCategory') {
       shop = shop.filter(element => {
