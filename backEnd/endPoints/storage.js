@@ -547,6 +547,7 @@ wsClient.on('connection', async (client, data) => {
   console.log(`connected client: ${newClient.phoneNumber}`)
 
   client.on('message', async msg => {
+    console.log(msg)
     msg = JSON.parse(msg)
 
     console.log(msg)
@@ -601,31 +602,48 @@ wsClient.on('connection', async (client, data) => {
             }
           }
           else if (key === "exceptions") {
-            for (let index = 0; index < data.filters[key].length; index++) {
-              const exception = data.filters[key][index]
+            const exceptionsArrayPrototype = new Array()
 
-              // shop = shop.filter(element => {
-              //   for (let index1 = 0; index1 < element.offerData.param.length; index1++) {
-              //     const checkExceptionKey = element.offerData.param[index1]
-              //     if (checkExceptionKey['@_name'] === exception.name) {
-              //       return checkExceptionKey['#text'] === exception.value
-              //     }
-              //   }
+            for (const filterException of data.filters[key]) {
+              const sameNameExceptionsTrash = data.filters[key].filter(exceptionElement => {
+                return filterException.name === exceptionElement.name
+              })
 
-              //   return false
-              // })
+              const sameNameExceptions = new Array()
+              for (const trash of sameNameExceptionsTrash) {
+                sameNameExceptions.push(trash.value)
+              }
 
+              exceptionsArrayPrototype.push({ name: filterException.name, values: sameNameExceptions })
+            }
+
+            for (let index = 0; index < exceptionsArrayPrototype.length; index++) {
               shop = shop.filter(element => {
                 for (const indexKey in element.offerData.properties) {
-                  if (indexKey === exception.name) {
-                    return element.offerData.properties[indexKey] === exception.value
+                  if (indexKey === exceptionsArrayPrototype[index].name) {
+                    console.log(exceptionsArrayPrototype[index])
+                    return exceptionsArrayPrototype[index].values.includes(element.offerData.properties[indexKey])
                   }
                 }
 
                 return false
               })
-
             }
+
+            // for (let index = 0; index < data.filters[key].length; index++) {
+            //   const exception = data.filters[key][index]
+
+            //   const tmp = shop.filter(element => {
+            //     for (const indexKey in element.offerData.properties) {
+            //       if (indexKey === exception.name) {
+            //         return element.offerData.properties[indexKey] === exception.value
+            //       }
+            //     }
+
+            //     return false
+            //   })
+            //   shop.push(tmp)
+            // }
           }
         }
       }
@@ -682,12 +700,6 @@ wsClient.on('connection', async (client, data) => {
           }
         }
       }
-
-      // for (const key in filterKeys) {
-      //   if (filterKeys[key].length === 1) {
-      //     delete filterKeys[key]
-      //   }
-      // }
 
       allProducts.sort(function (a, b) {
         if (a.offerData.price < b.offerData.price) {
