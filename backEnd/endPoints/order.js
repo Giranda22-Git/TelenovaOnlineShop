@@ -115,4 +115,13 @@ router.post('/orderStatus', async (req, res) => {
 // end switch orderStatus
 
 
+// begin delete all orders
+router.delete('/deleteAllOrders', async (req, res) => {
+  const result = await mongoOrders.deleteMany({}).exec()
+
+  res.json(result)
+})
+// end delete all orders
+
+
 module.exports = router
