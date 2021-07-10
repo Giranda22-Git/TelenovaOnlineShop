@@ -536,6 +536,35 @@ content-type: application/json
 // end get goods by category name
 
 
+// begin get goods by any level category
+
+router.post('/getGoods/categories', async (req, res) => {
+  const data = req.body
+  const shop = await mongoStorage.find().exec()
+  for (const key in data) {
+    if (key === 'firstLevelCategory') {
+      shop = shop.filter(element => {
+        return element.offerData.category_list[0] === data[key]
+      })
+    }
+    else if (key === 'secondLevelCategory') {
+      shop = shop.filter(element => {
+        return element.offerData.category_list[1] === data[key]
+      })
+    }
+    else if (key === 'thirdLevelCategory') {
+      shop = shop.filter(element => {
+        return element.offerData.category_list[2] === data[key]
+      })
+    }
+  }
+
+  res.json({ products: shop })
+})
+
+// end get goods by any level category
+
+
 // begin WebSocket Client connection
 wsClient.on('connection', async (client, data) => {
   const newClient = {
