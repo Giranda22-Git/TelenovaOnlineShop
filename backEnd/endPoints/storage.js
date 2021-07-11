@@ -685,6 +685,7 @@ wsClient.on('connection', async (client, data) => {
 
           if (product.offerData.name.includes(queryArray.join().split(' ')[0])) {
             resultArray.unshift(product)
+            console.log('inshift', product.offerData.name)
             return
           }
 
@@ -694,7 +695,6 @@ wsClient.on('connection', async (client, data) => {
           })
 
           const result = (coincidence / queryArray.length) * 100
-          console.log(product.offerData.name, queryArray, result)
 
           if (result >= 80)
             resultArray.push(product)
