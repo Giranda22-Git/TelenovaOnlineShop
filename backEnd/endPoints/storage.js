@@ -695,7 +695,7 @@ wsClient.on('connection', async (client, data) => {
         })
 
         resultArray.sort((a, b) => {
-          if (a.offerData.name.includes(queryArray[0]) || a.offerData.name.includes(queryArray.join(' '))) {
+          if (a.offerData.name.includes(queryArray.join().split(' ')[0]) || a.offerData.name.includes(queryArray.join())) {
             console.log(a.offerData.name)
             return -1
           } else {
