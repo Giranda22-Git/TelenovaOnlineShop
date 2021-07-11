@@ -711,7 +711,21 @@ wsClient.on('connection', async (client, data) => {
               }
             })
 
-            console.log(product.offerData.name, product.symbolsRange, result)
+            const tmpProductSymbolsRange = product.symbolsRange.filter(symbol => {
+              return symbol.length === 1
+            })
+
+            const average = arraySum(tmpProductSymbolsRange) / tmpProductSymbolsRange.length
+
+            product.symbolsRange.forEach((symbol, index) => {
+              if (symbol.length > 1) {
+                product.symbolsRange[index] = [nearNumber(symbol, average)]
+              }
+            })
+
+            product.symbolsRangeAverage = arraySum(product.symbolsRange) / product.symbolsRange.length
+
+            console.log(product.offerData.name, product.symbolsRange, product.symbolsRangeAverage)
 
             resultArray.push(product)
           }
@@ -815,6 +829,25 @@ content-type: application/json
 }
 
 */
+
+function nearNumber (arr, number) {
+  arr.map(it => {
+    const ch = (it >= 0 ? it : -it) + number
+    return {
+      base: it,
+      result: ch >= 0 ? ch : -ch
+    }
+  }).sort((a, b) => a.result - b.result)[0].base
+  return arr[0]
+}
+
+function arraySum (arr) {
+  let result = 0
+  for (const element of arr) {
+    result += element[0]
+  }
+  return result
+}
 
 function findIndices (str, symbol) {
   const indices = []
