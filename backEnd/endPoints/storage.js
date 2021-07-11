@@ -731,6 +731,16 @@ wsClient.on('connection', async (client, data) => {
           }
         })
 
+        resultArray.sort(function (a, b) {
+          if (a.symbolsRangeAverage < b.symbolsRangeAverage) {
+            return 1
+          }
+          if (a.symbolsRangeAverage > b.symbolsRangeAverage) {
+            return -1
+          }
+          return 0
+        })
+
         resultArray.unshift(fullSameProducts)
 
         shop = resultArray
