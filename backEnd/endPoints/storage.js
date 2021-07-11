@@ -677,9 +677,10 @@ wsClient.on('connection', async (client, data) => {
         }
       }
       if (data.query) {
-        const queryArray = data.query.split('')
+        const queryArray = data.query.toLowerCase().split('')
         const resultArray = new Array()
         shop.forEach(product => {
+          product.offerData.name = product.offerData.name.toLowerCase()
           let coincidence = 0
           queryArray.forEach(symbol => {
             if (product.offerData.name.includes(symbol))
@@ -692,6 +693,15 @@ wsClient.on('connection', async (client, data) => {
           if (result >= 80)
             resultArray.push(product)
         })
+
+        resultArray.sort((a, b) => {
+          if (a.offerData.name.includes(queryArray[0]) || a.offerData.name.includes(queryArray.join(' '))) {
+            return 1
+          } else {
+            return -1
+          }
+        })
+
         shop = resultArray
       }
 
