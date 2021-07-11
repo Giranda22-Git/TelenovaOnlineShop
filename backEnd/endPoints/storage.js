@@ -559,6 +559,10 @@ router.post('/getGoods/categories', async (req, res) => {
     }
   }
 
+  if (data.count) {
+    shop = shop.slice(0, data.count)
+  }
+
   res.json({ products: shop })
 })
 
