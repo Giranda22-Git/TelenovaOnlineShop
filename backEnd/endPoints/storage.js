@@ -702,7 +702,7 @@ wsClient.on('connection', async (client, data) => {
             product.symbolsRange = new Array()
 
             queryArray.forEach(symbol => {
-              product.symbolsRange.push(findIndices(product.offerData.name, symbol))
+              product.symbolsRange.push(findIndices(productName, symbol))
             })
 
             console.log(product.offerData.name, product.symbolsRange, result)
