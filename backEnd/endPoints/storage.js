@@ -787,14 +787,16 @@ wsClient.on('connection', async (client, data) => {
       }
 
       const filterKeys = {}
-      for (const product of allProducts) {
-        for (const property of Object.keys(product.offerData.properties)) {
-          if (!(Object.keys(filterKeys).includes(property))) {
-            filterKeys[property] = new Array()
-          }
+      if (!data.query) {
+        for (const product of allProducts) {
+          for (const property of Object.keys(product.offerData.properties)) {
+            if (!(Object.keys(filterKeys).includes(property))) {
+              filterKeys[property] = new Array()
+            }
 
-          if (!(filterKeys[property].includes(product.offerData.properties[property]))) {
-            filterKeys[property].push(product.offerData.properties[property])
+            if (!(filterKeys[property].includes(product.offerData.properties[property]))) {
+              filterKeys[property].push(product.offerData.properties[property])
+            }
           }
         }
       }
