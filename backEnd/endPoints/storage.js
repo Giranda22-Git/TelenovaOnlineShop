@@ -683,7 +683,7 @@ wsClient.on('connection', async (client, data) => {
           product.offerData.name = product.offerData.name.toLowerCase()
           let coincidence = 0
 
-          if (product.offerData.name.includes(queryArray.join().split(' ')[0])) {
+          if (product.offerData.name.includes(data.query.toLowerCase())) {
             resultArray.unshift(product)
             console.log('inshift', product.offerData.name)
             return
