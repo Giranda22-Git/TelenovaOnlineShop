@@ -726,7 +726,7 @@ wsClient.on('connection', async (client, data) => {
             const symbolsRangeAverage = arraySum(product.symbolsRange) / product.symbolsRange.length
             const resProduct = {
               symbolsRangeAverage,
-              product
+              tmpProduct: product
             }
             console.log(resProduct)
 
@@ -743,9 +743,21 @@ wsClient.on('connection', async (client, data) => {
           return 0
         })
 
-        resultArray.unshift(fullSameProducts)
+        const finishAnswerArray = new Array()
 
-        shop = resultArray
+        resultArray.forEach(element => {
+          if (Object.keys(element).includes('tmpProduct')) {
+            finishAnswerArray.push(element.tmpProduct)
+          } else {
+            finishAnswerArray.push(element)
+          }
+        })
+
+        if (fullSameProducts.length !== 0) {
+          finishAnswerArray.unshift(fullSameProducts)
+        }
+
+        shop = finishAnswerArray
       }
 
       if (shop.length === 0) client.send(JSON.stringify({ priceRange: [0,0], filterKeys: [], products: [] }))
