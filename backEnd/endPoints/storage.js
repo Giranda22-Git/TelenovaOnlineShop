@@ -683,16 +683,16 @@ wsClient.on('connection', async (client, data) => {
       if (data.query) {
         const queryArray = data.query.toLowerCase().split('')
         const resultArray = new Array()
-        const fullSameProducts = new Array()
+        // const fullSameProducts = new Array()
         shop.forEach(product => {
           const productName = product.offerData.name.toLowerCase()
           let coincidence = 0
 
-          if (productName.includes(data.query.toLowerCase())) {
-            fullSameProducts.push(product)
-            console.log('unshift', productName)
-            return
-          }
+          // if (productName.includes(data.query.toLowerCase())) {
+          //   fullSameProducts.push(product)
+          //   console.log('unshift', productName)
+          //   return
+          // }
 
           queryArray.forEach(symbol => {
             if (productName.includes(symbol))
@@ -757,9 +757,9 @@ wsClient.on('connection', async (client, data) => {
           }
         })
 
-        if (fullSameProducts.length !== 0) {
-          finishAnswerArray.unshift(fullSameProducts)
-        }
+        // if (fullSameProducts.length !== 0) {
+        //   finishAnswerArray.unshift(fullSameProducts)
+        // }
 
         shop = finishAnswerArray
       }
