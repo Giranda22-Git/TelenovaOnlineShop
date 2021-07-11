@@ -723,11 +723,14 @@ wsClient.on('connection', async (client, data) => {
               }
             })
 
-            product.symbolsRangeAverage = arraySum(product.symbolsRange) / product.symbolsRange.length
+            const symbolsRangeAverage = arraySum(product.symbolsRange) / product.symbolsRange.length
+            const resProduct = {
+              symbolsRangeAverage,
+              product
+            }
+            console.log(resProduct)
 
-            console.log(product)
-
-            resultArray.push(product)
+            resultArray.push(resProduct)
           }
         })
         resultArray.sort(function (a, b) {
