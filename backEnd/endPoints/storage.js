@@ -707,7 +707,7 @@ wsClient.on('connection', async (client, data) => {
 
             product.symbolsRange.forEach((symbol, index) => {
               if (symbol.includes(-1)) {
-                delete product.symbolsRange[index]
+                product.symbolsRange.splice(index, 1)
               }
             })
 
