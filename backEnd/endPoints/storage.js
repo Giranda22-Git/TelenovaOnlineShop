@@ -679,26 +679,39 @@ wsClient.on('connection', async (client, data) => {
       if (data.query) {
         const queryArray = data.query.toLowerCase().split('')
         const resultArray = new Array()
+        const fullSameProducts = new Array()
         shop.forEach(product => {
-          product.offerData.name = product.offerData.name.toLowerCase()
+          const productName = product.offerData.name.toLowerCase()
           let coincidence = 0
 
-          if (product.offerData.name.includes(data.query.toLowerCase())) {
-            resultArray.unshift(product)
-            console.log('inshift', product.offerData.name)
+          if (productName.includes(data.query.toLowerCase())) {
+            fullSameProducts.push(product)
+            console.log('unshift', productName)
             return
           }
 
           queryArray.forEach(symbol => {
-            if (product.offerData.name.includes(symbol))
+            if (productName.includes(symbol))
               coincidence++
           })
 
           const result = (coincidence / queryArray.length) * 100
 
-          if (result >= 80)
+          if (result >= 80) {
+
+            product.symbolsRange = new Array()
+
+            queryArray.forEach(symbol => {
+              product.symbolsRange.push(findIndices(product.offerData.name, symbol))
+            })
+
+            console.log(product.offerData.name, product.symbolsRange)
+
             resultArray.push(product)
+          }
         })
+
+        resultArray.unshift(fullSameProducts)
 
         shop = resultArray
       }
@@ -797,7 +810,17 @@ content-type: application/json
 
 */
 
-
+function findIndices (str, symbol) {
+  const indices = []
+  if (str.includes(symbol)) {
+    for(var i=0; i < str.length; i++) {
+      if (str[i] === symbol) indices.push(i)
+    }
+  } else {
+    indices.push(-1)
+  }
+  return indices
+}
 
 module.exports = router
 
