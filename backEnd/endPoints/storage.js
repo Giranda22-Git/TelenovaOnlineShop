@@ -725,12 +725,11 @@ wsClient.on('connection', async (client, data) => {
 
             product.symbolsRangeAverage = arraySum(product.symbolsRange) / product.symbolsRange.length
 
-            console.log(product.offerData.name, product.symbolsRange, product.symbolsRangeAverage)
+            console.log(product)
 
             resultArray.push(product)
           }
         })
-        console.log(resultArray)
         resultArray.sort(function (a, b) {
           if (a.symbolsRangeAverage < b.symbolsRangeAverage) {
             return 1
