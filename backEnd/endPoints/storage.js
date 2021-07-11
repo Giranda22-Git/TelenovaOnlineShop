@@ -696,6 +696,7 @@ wsClient.on('connection', async (client, data) => {
 
         resultArray.sort((a, b) => {
           if (a.offerData.name.includes(queryArray[0]) || a.offerData.name.includes(queryArray.join(' '))) {
+            console.log(a.offerData.name)
             return -1
           } else {
             return 1
@@ -749,7 +750,6 @@ wsClient.on('connection', async (client, data) => {
         }
         return 0
       })
-      console.log(shop)
       const finishAnswer = {
         priceRange: [allProducts[0].offerData.price, allProducts[allProducts.length - 1].offerData.price],
         filterKeys,
