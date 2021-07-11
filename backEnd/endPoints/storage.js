@@ -705,6 +705,12 @@ wsClient.on('connection', async (client, data) => {
               product.symbolsRange.push(findIndices(productName, symbol))
             })
 
+            product.symbolsRange.forEach((symbol, index) => {
+              if (symbol.includes(-1)) {
+                delete product.symbolsRange[index]
+              }
+            })
+
             console.log(product.offerData.name, product.symbolsRange, result)
 
             resultArray.push(product)
