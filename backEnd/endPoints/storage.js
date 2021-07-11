@@ -730,7 +730,7 @@ wsClient.on('connection', async (client, data) => {
             resultArray.push(product)
           }
         })
-
+        console.log(resultArray)
         resultArray.sort(function (a, b) {
           if (a.symbolsRangeAverage < b.symbolsRangeAverage) {
             return 1
