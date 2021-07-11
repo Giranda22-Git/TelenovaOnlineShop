@@ -705,7 +705,7 @@ wsClient.on('connection', async (client, data) => {
               product.symbolsRange.push(findIndices(product.offerData.name, symbol))
             })
 
-            console.log(product.offerData.name, product.symbolsRange)
+            console.log(product.offerData.name, product.symbolsRange, result)
 
             resultArray.push(product)
           }
