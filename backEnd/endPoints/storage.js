@@ -683,58 +683,57 @@ wsClient.on('connection', async (client, data) => {
       if (data.query) {
         const queryArray = data.query.toLowerCase().split('')
         const resultArray = new Array()
-        // const fullSameProducts = new Array()
+        const fullSameProducts = new Array()
         shop.forEach(product => {
           const productName = product.offerData.name.toLowerCase()
           let coincidence = 0
 
-          // if (productName.includes(data.query.toLowerCase())) {
-          //   fullSameProducts.push(product)
-          //   console.log('unshift', productName)
-          //   return
-          // }
-
-          queryArray.forEach(symbol => {
-            if (productName.includes(symbol))
-              coincidence++
-          })
-
-          const result = (coincidence / queryArray.length) * 100
-
-          if (result >= 80) {
-
-            product.symbolsRange = new Array()
-
+          if (productName.includes(data.query.toLowerCase())) {
+            fullSameProducts.push(product)
+            console.log('unshift', productName)
+          } else {
             queryArray.forEach(symbol => {
-              product.symbolsRange.push(findIndices(productName, symbol))
+              if (productName.includes(symbol))
+                coincidence++
             })
 
-            product.symbolsRange.forEach((symbol, index) => {
-              if (symbol.includes(-1)) {
-                product.symbolsRange.splice(index, 1)
+            const result = (coincidence / queryArray.length) * 100
+
+            if (result >= 80) {
+
+              product.symbolsRange = new Array()
+
+              queryArray.forEach(symbol => {
+                product.symbolsRange.push(findIndices(productName, symbol))
+              })
+
+              product.symbolsRange.forEach((symbol, index) => {
+                if (symbol.includes(-1)) {
+                  product.symbolsRange.splice(index, 1)
+                }
+              })
+
+              const tmpProductSymbolsRange = product.symbolsRange.filter(symbol => {
+                return symbol.length === 1
+              })
+
+              const average = arraySum(tmpProductSymbolsRange) / tmpProductSymbolsRange.length
+
+              product.symbolsRange.forEach((symbol, index) => {
+                if (symbol.length > 1) {
+                  product.symbolsRange[index] = [nearNumber(symbol, average)]
+                }
+              })
+
+              const symbolsRangeAverage = arraySum(product.symbolsRange) / product.symbolsRange.length
+              const resProduct = {
+                symbolsRangeAverage,
+                tmpProduct: product
               }
-            })
+              console.log(product.offerData.name, symbolsRangeAverage)
 
-            const tmpProductSymbolsRange = product.symbolsRange.filter(symbol => {
-              return symbol.length === 1
-            })
-
-            const average = arraySum(tmpProductSymbolsRange) / tmpProductSymbolsRange.length
-
-            product.symbolsRange.forEach((symbol, index) => {
-              if (symbol.length > 1) {
-                product.symbolsRange[index] = [nearNumber(symbol, average)]
-              }
-            })
-
-            const symbolsRangeAverage = arraySum(product.symbolsRange) / product.symbolsRange.length
-            const resProduct = {
-              symbolsRangeAverage,
-              tmpProduct: product
+              resultArray.push(resProduct)
             }
-            console.log(product.offerData.name, symbolsRangeAverage)
-
-            resultArray.push(resProduct)
           }
         })
         resultArray.sort(function (a, b) {
@@ -757,9 +756,11 @@ wsClient.on('connection', async (client, data) => {
           }
         })
 
-        // if (fullSameProducts.length !== 0) {
-        //   finishAnswerArray.unshift(fullSameProducts)
-        // }
+        if (fullSameProducts.length !== 0) {
+          fullSameProducts.forEach(element => {
+            finishAnswerArray.unshift(element)
+          })
+        }
 
         shop = finishAnswerArray
       }
