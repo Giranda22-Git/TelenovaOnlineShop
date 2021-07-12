@@ -737,7 +737,7 @@ wsClient.on('connection', async (client, data) => {
                 }
               }
 
-              console.log('Range generate: ', symbolsRangeArray)
+              console.log('Range generate: ', symbolIndices, symbolsRangeArray)
 
               const symbolsRangeAverage = arraySum(symbolsRangeArray) / symbolIndices.length
               const resProduct = {
@@ -895,9 +895,7 @@ content-type: application/json
 function nearNumberArray (arr1, arr2) {
   const rangesArray = new Array()
   arr2.forEach(element => {
-    console.log('element: ', element)
     rangesArray.push({ first: nearNumber(arr1, element), second: element })
-    console.log('check', rangesArray)
   })
   rangesArray.sort((a, b) => { return a.first.result - b.first.result })
   return { first: rangesArray[0].first.base, second: rangesArray[0].second }
