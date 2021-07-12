@@ -888,6 +888,7 @@ function nearNumberArray (arr1, arr2) {
   arr2.forEach(element => {
     console.log('element: ', element)
     rangesArray.push({ first: nearNumber(arr1, element), second: element })
+    console.log('check', rangesArray)
   })
   rangesArray.sort((a, b) => { return a.first.result - b.first.result })
   return { first: rangesArray[0].first.base, second: rangesArray[0].second }
