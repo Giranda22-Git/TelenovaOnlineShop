@@ -707,15 +707,11 @@ wsClient.on('connection', async (client, data) => {
                 symbolIndices.push(findIndices(productName, symbol))
               })
 
-              console.log('findIndices: ', symbolIndices)
-
               symbolIndices.forEach((symbol, index) => {
                 if (symbol.includes(-1)) {
                   symbolIndices.splice(index, 1)
                 }
               })
-
-              console.log('delete -1: ', symbolIndices)
 
               const symbolsRangeArray = new Array()
 
@@ -890,6 +886,7 @@ content-type: application/json
 function nearNumberArray (arr1, arr2) {
   const rangesArray = new Array()
   arr2.forEach(element => {
+    console.log('element: ', element)
     rangesArray.push({ first: nearNumber(arr1, element), second: element })
   })
   rangesArray.sort((a, b) => { return a.first.result - b.first.result })
