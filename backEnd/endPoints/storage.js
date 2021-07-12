@@ -701,31 +701,34 @@ wsClient.on('connection', async (client, data) => {
 
             if (result >= 80) {
 
-              product.symbolsRange = new Array()
+              const symbolIndices = new Array()
 
               queryArray.forEach(symbol => {
-                product.symbolsRange.push(findIndices(productName, symbol))
+                symbolIndices.push(findIndices(productName, symbol))
               })
 
-              product.symbolsRange.forEach((symbol, index) => {
+              symbolIndices.forEach((symbol, index) => {
                 if (symbol.includes(-1)) {
-                  product.symbolsRange.splice(index, 1)
+                  symbolIndices.splice(index, 1)
                 }
               })
 
-              const tmpProductSymbolsRange = product.symbolsRange.filter(symbol => {
-                return symbol.length === 1
-              })
+              const symbolsRangeArray = new Array()
 
-              const average = arraySum(tmpProductSymbolsRange) / tmpProductSymbolsRange.length
+              for (let index = 1; index < symbolIndices.length; index++) {
+                const result = nearNumberArray(symbolIndices[index - 1], symbolIndices[index])
 
-              product.symbolsRange.forEach((symbol, index) => {
-                if (symbol.length > 1) {
-                  product.symbolsRange[index] = [nearNumber(symbol, average)]
+                symbolIndices[index - 1] = [result.first]
+                symbolIndices[index] = [result.second]
+
+                if (symbolIndices[index - 1][0] < symbolIndices[index][0]) {
+                  symbolsRangeArray.push(symbolIndices[index][0] - symbolIndices[index - 1][0])
+                } else {
+                  symbolsRangeArray.push((symbolIndices[index][0] - symbolIndices[index - 1][0]) * Math.PI)
                 }
-              })
+              }
 
-              const symbolsRangeAverage = arraySum(product.symbolsRange) / product.symbolsRange.length
+              const symbolsRangeAverage = arraySum(symbolsRangeArray) / symbolIndices.length
               const resProduct = {
                 symbolsRangeAverage,
                 tmpProduct: product
@@ -878,6 +881,15 @@ content-type: application/json
 
 */
 
+function nearNumberArray (arr1, arr2) {
+  const rangesArray = new Array()
+  arr2.forEach(element => {
+    rangesArray.push({ first: nearNumber(arr1, element), second: element })
+  })
+  rangesArray.sort((a, b) => { return a.first.result - b.first.result })
+  return { first: rangesArray[0].first.base, second: rangesArray[0].second }
+}
+
 function nearNumber (arr, number) {
   arr.map(it => {
     const ch = (it >= 0 ? it : -it) + number
@@ -885,14 +897,14 @@ function nearNumber (arr, number) {
       base: it,
       result: ch >= 0 ? ch : -ch
     }
-  }).sort((a, b) => a.result - b.result)[0].base
+  }).sort((a, b) => a.result - b.result)[0]
   return arr[0]
 }
 
 function arraySum (arr) {
   let result = 0
   for (const element of arr) {
-    result += element[0]
+    result += element
   }
   return result
 }
