@@ -696,8 +696,8 @@ wsClient.on('connection', async (client, data) => {
         shop.forEach(product => {
           const productName = product.offerData.name.toLowerCase()
           let coincidence = 0
-
-          if (productName.includes(data.query.toLowerCase())) {
+          // productName.includes(data.query.toLowerCase())
+          if (false) {
             fullSameProducts.push(product)
             console.log('unshift', productName)
           } else {
