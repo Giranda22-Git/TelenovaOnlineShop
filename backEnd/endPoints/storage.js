@@ -707,11 +707,15 @@ wsClient.on('connection', async (client, data) => {
                 symbolIndices.push(findIndices(productName, symbol))
               })
 
+              console.log('findIndices: ', symbolIndices)
+
               symbolIndices.forEach((symbol, index) => {
                 if (symbol.includes(-1)) {
                   symbolIndices.splice(index, 1)
                 }
               })
+
+              console.log('delete -1: ', symbolIndices)
 
               const symbolsRangeArray = new Array()
 
@@ -727,6 +731,8 @@ wsClient.on('connection', async (client, data) => {
                   symbolsRangeArray.push((symbolIndices[index][0] - symbolIndices[index - 1][0]) * Math.PI)
                 }
               }
+
+              console.log('Range generate: ', symbolsRangeArray)
 
               const symbolsRangeAverage = arraySum(symbolsRangeArray) / symbolIndices.length
               const resProduct = {
