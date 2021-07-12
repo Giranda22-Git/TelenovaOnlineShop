@@ -15,7 +15,7 @@ const nearNumber = (arr, number) =>
         base: it,
         result: ch >= 0 ? ch : -ch
       };
-    }).sort((a, b) => { return a.result - b.result && a.result > b.result })[0]
+    }).sort((a, b) => { return a.result - b.result && a.result < b.result })[0]
 
 async function addFirstLevelCategoryTree(firstCategory) {
   const isExists = await mongoCategoryTree.findOne({ trigger: 'current' })
