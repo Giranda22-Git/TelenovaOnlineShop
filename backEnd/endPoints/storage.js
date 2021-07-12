@@ -767,28 +767,31 @@ wsClient.on('connection', async (client, data) => {
 
       if (shop.length === 0) client.send(JSON.stringify({ priceRange: [0,0], filterKeys: [], products: [] }))
 
-      let allProducts = await mongoStorage.find().exec()
-
-      for (const key in data.filters) {
-        if (key === "firstLevelCategory") {
-          allProducts = allProducts.filter(element => {
-            return element.offerData.category_list[0] === data.filters[key]
-          })
-        }
-        else if (key === "secondLevelCategory") {
-          allProducts = allProducts.filter(element => {
-            return element.offerData.category_list[1] === data.filters[key]
-          })
-        }
-        else if (key === "thirdLevelCategory") {
-          allProducts = allProducts.filter(element => {
-            return element.offerData.category_list[2] === data.filters[key]
-          })
-        }
-      }
+      let allProducts = []
 
       const filterKeys = {}
+
       if (!data.query) {
+        allProducts = await mongoStorage.find().exec()
+
+        for (const key in data.filters) {
+          if (key === "firstLevelCategory") {
+            allProducts = allProducts.filter(element => {
+              return element.offerData.category_list[0] === data.filters[key]
+            })
+          }
+          else if (key === "secondLevelCategory") {
+            allProducts = allProducts.filter(element => {
+              return element.offerData.category_list[1] === data.filters[key]
+            })
+          }
+          else if (key === "thirdLevelCategory") {
+            allProducts = allProducts.filter(element => {
+              return element.offerData.category_list[2] === data.filters[key]
+            })
+          }
+        }
+
         for (const product of allProducts) {
           for (const property of Object.keys(product.offerData.properties)) {
             if (!(Object.keys(filterKeys).includes(property))) {
@@ -800,6 +803,20 @@ wsClient.on('connection', async (client, data) => {
             }
           }
         }
+      } else {
+        for (const product of shop) {
+          for (const property of Object.keys(product.offerData.properties)) {
+            if (!(Object.keys(filterKeys).includes(property))) {
+              filterKeys[property] = new Array()
+            }
+
+            if (!(filterKeys[property].includes(product.offerData.properties[property]))) {
+              filterKeys[property].push(product.offerData.properties[property])
+            }
+          }
+        }
+
+        allProducts = shop
       }
 
       allProducts.sort(function (a, b) {
