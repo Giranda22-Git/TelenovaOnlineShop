@@ -726,18 +726,16 @@ wsClient.on('connection', async (client, data) => {
 
               for (let index = 1; index < symbolIndices.length; index++) {
                 const result = nearNumberArray(symbolIndices[index - 1], symbolIndices[index])
-
+                console.log('Range generate first: ', symbolIndices)
                 symbolIndices[index - 1] = [result.first]
                 symbolIndices[index] = [result.second]
-
+                console.log('Range generate second: ', symbolIndices)
                 if (symbolIndices[index - 1][0] < symbolIndices[index][0]) {
                   symbolsRangeArray.push(symbolIndices[index][0] - symbolIndices[index - 1][0])
                 } else {
                   symbolsRangeArray.push((symbolIndices[index][0] - symbolIndices[index - 1][0]) * Math.PI)
                 }
               }
-
-              console.log('Range generate: ', symbolIndices, symbolsRangeArray)
 
               const symbolsRangeAverage = arraySum(symbolsRangeArray) / symbolIndices.length
               const resProduct = {
