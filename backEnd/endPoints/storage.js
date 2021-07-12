@@ -15,7 +15,7 @@ const nearNumber = (arr, number) =>
         base: it,
         result: ch >= 0 ? ch : -ch
       };
-    }).sort((a, b) => { return a.result - b.result && a.result < b.result })[0]
+    }).sort((a, b) => { return a.result - b.result && a.result > b.result })[0]
 
 async function addFirstLevelCategoryTree(firstCategory) {
   const isExists = await mongoCategoryTree.findOne({ trigger: 'current' })
@@ -895,7 +895,7 @@ function nearNumberArray (arr1, arr2) {
   arr2.forEach(element => {
     rangesArray.push({ first: nearNumber(arr1, element), second: element })
   })
-  rangesArray.sort((a, b) => { return a.first.result - b.first.result })
+  rangesArray.sort((a, b) => { return a.first.result - b.first.result && a.first.result > b.first.result })
   return { first: rangesArray[0].first.base, second: rangesArray[0].second }
 }
 
