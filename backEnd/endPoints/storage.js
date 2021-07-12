@@ -8,6 +8,15 @@ const mongoStorage = require('../models/Storage.js').mongoStorage
 const mongoCategoryTree = require('../models/CategoryTree.js').mongoCategoryTree
 const mongoCategoryList = require('../models/CategoryList.js').mongoCategoryList
 
+const nearNumber = (arr, number) =>
+  arr.map(it => {
+      const ch = (it >= 0 ? it : -it) + number;
+      return {
+        base: it,
+        result: ch >= 0 ? ch : -ch
+      };
+    }).sort((a, b) => a.result - b.result)[0]
+
 async function addFirstLevelCategoryTree(firstCategory) {
   const isExists = await mongoCategoryTree.findOne({ trigger: 'current' })
 
@@ -894,16 +903,16 @@ function nearNumberArray (arr1, arr2) {
   return { first: rangesArray[0].first.base, second: rangesArray[0].second }
 }
 
-function nearNumber (arr, number) {
-  arr.map(it => {
-    const ch = (it >= 0 ? it : -it) + number
-    return {
-      base: it,
-      result: ch >= 0 ? ch : -ch
-    }
-  }).sort((a, b) => a.result - b.result)[0]
-  return arr[0]
-}
+// function nearNumber (arr, number) {
+//   arr.map(it => {
+//     const ch = (it >= 0 ? it : -it) + number
+//     return {
+//       base: it,
+//       result: ch >= 0 ? ch : -ch
+//     }
+//   }).sort((a, b) => a.result - b.result)[0]
+//   return arr[0]
+// }
 
 function arraySum (arr) {
   let result = 0
