@@ -753,7 +753,7 @@ wsClient.on('connection', async (client, data) => {
                   symbolsRangeAverage *= -1
                 }
 
-                console.log(productName, symbolsRangeAverage)
+                console.log(productName.join(''), cutedQuery, symbolsRangeAverage)
 
                 const resProduct = {
                   symbolsRangeAverage,
