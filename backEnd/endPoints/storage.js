@@ -712,7 +712,7 @@ wsClient.on('connection', async (client, data) => {
             if (result >= 80) {
 
                 const symbolIndices = new Array()
-                console.log('result: ', productName.match(new RegExp(regExpGenerate(queryArray.join()))))
+                console.log('result: ', productName.match(new RegExp(regExpGenerate(queryArray.join('')))))
                 queryArray.forEach(symbol => {
                   symbolIndices.push(findIndices(productName, symbol))
                 })
