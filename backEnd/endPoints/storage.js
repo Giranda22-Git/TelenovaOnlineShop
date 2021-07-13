@@ -757,19 +757,14 @@ wsClient.on('connection', async (client, data) => {
                   symbolsRangeAverage,
                   tmpProduct: product
                 }
-                // const newProduct = new Object()
-                // for (const productKey in product) {
-                //   newProduct[productKey] = product[productKey]
-                // }
-                // newProduct.symbolsRangeAverage = symbolsRangeAverage
 
-                // console.log(newProduct, symbolsRangeAverage)
+                product.symbolsRangeAverage = symbolsRangeAverage
+                console.log(product)
                 resultArray.push(resProduct)
               }
             }
           }
         })
-        console.log('start: ', resultArray)
         resultArray.sort(function (a, b) {
           if (a.symbolsRangeAverage < b.symbolsRangeAverage) {
             return -1
@@ -779,7 +774,6 @@ wsClient.on('connection', async (client, data) => {
           }
           return 0
         })
-        console.log('end: ', resultArray)
         const finishAnswerArray = new Array()
 
         resultArray.forEach(element => {
