@@ -763,7 +763,7 @@ wsClient.on('connection', async (client, data) => {
                 }
                 newProduct.symbolsRangeAverage = symbolsRangeAverage
 
-                console.log(newProduct)
+                console.log(newProduct.symbolsRangeAverage)
 
                 resultArray.push(newProduct)
               }
