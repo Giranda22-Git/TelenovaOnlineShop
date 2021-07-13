@@ -925,13 +925,14 @@ function regExpGenerate (productName, str) {
     console.log(regExpression)
     result.push({result: productName.match(regExpression), expression: regExpression})
   })
-  console.log(result)
 
   result.forEach((element, index) => {
     if (!element.result) {
       result.splice(index, 1)
     }
   })
+
+  console.log(result)
 
   result.sort((a, b) => a.result.length - b.result.length)
 
