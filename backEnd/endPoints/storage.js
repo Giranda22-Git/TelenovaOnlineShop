@@ -908,7 +908,7 @@ String.prototype.replaceAt = function(index, replacement) {
 }
 
 function regExpGenerate (productName, str) {
-  const result = new Array()
+  let result = new Array()
 
   let regExpression = str.split('').join('.*')
   console.log(productName)
@@ -934,6 +934,8 @@ function regExpGenerate (productName, str) {
       deleteCount++
     }
   })
+
+  result = tmpResult
 
   console.log(result)
 
