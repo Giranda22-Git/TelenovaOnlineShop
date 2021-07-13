@@ -697,6 +697,7 @@ wsClient.on('connection', async (client, data) => {
           const productName = product.offerData.name.toLowerCase()
           let coincidence = 0
           // productName.includes(data.query.toLowerCase())
+
           if (false) {
             fullSameProducts.push(product)
             console.log('unshift', productName)
@@ -710,41 +711,44 @@ wsClient.on('connection', async (client, data) => {
 
             if (result >= 80) {
 
-              const symbolIndices = new Array()
+                const symbolIndices = new Array()
 
-              queryArray.forEach(symbol => {
-                symbolIndices.push(findIndices(productName, symbol))
-              })
+                queryArray.forEach(symbol => {
+                  symbolIndices.push(findIndices(productName, symbol))
+                })
 
-              symbolIndices.forEach((symbol, index) => {
-                if (symbol.includes(-1)) {
-                  symbolIndices.splice(index, 1)
+                symbolIndices.forEach((symbol, index) => {
+                  if (symbol.includes(-1)) {
+                    symbolIndices.splice(index, 1)
+                  }
+                })
+
+                if (isStrictOrder(symbolIndices)) {
+
+                const symbolsRangeArray = new Array()
+
+                for (let index = 1; index < symbolIndices.length; index++) {
+                  const result = nearNumberArray(symbolIndices[index - 1], symbolIndices[index])
+                  console.log('Range generate first: ', symbolIndices)
+                  symbolIndices[index - 1] = [result.first]
+                  symbolIndices[index] = [result.second]
+                  console.log('Range generate second: ', symbolIndices)
+                  if (symbolIndices[index - 1][0] < symbolIndices[index][0]) {
+                    symbolsRangeArray.push(symbolIndices[index][0] - symbolIndices[index - 1][0])
+                  } else {
+                    symbolsRangeArray.push((symbolIndices[index][0] - symbolIndices[index - 1][0]) * Math.PI)
+                  }
                 }
-              })
 
-              const symbolsRangeArray = new Array()
-
-              for (let index = 1; index < symbolIndices.length; index++) {
-                const result = nearNumberArray(symbolIndices[index - 1], symbolIndices[index])
-                console.log('Range generate first: ', symbolIndices)
-                symbolIndices[index - 1] = [result.first]
-                symbolIndices[index] = [result.second]
-                console.log('Range generate second: ', symbolIndices)
-                if (symbolIndices[index - 1][0] < symbolIndices[index][0]) {
-                  symbolsRangeArray.push(symbolIndices[index][0] - symbolIndices[index - 1][0])
-                } else {
-                  symbolsRangeArray.push((symbolIndices[index][0] - symbolIndices[index - 1][0]) * Math.PI)
+                const symbolsRangeAverage = arraySum(symbolsRangeArray) / symbolIndices.length
+                const resProduct = {
+                  symbolsRangeAverage,
+                  tmpProduct: product
                 }
-              }
+                console.log(product.offerData.name, symbolsRangeAverage)
 
-              const symbolsRangeAverage = arraySum(symbolsRangeArray) / symbolIndices.length
-              const resProduct = {
-                symbolsRangeAverage,
-                tmpProduct: product
+                resultArray.push(resProduct)
               }
-              console.log(product.offerData.name, symbolsRangeAverage)
-
-              resultArray.push(resProduct)
             }
           }
         })
@@ -889,6 +893,19 @@ content-type: application/json
 }
 
 */
+
+function isStrictOrder (arr) {
+  for (let index = 0; index < arr.length - 1; index++) {
+    for (let index1 = 0; index1 < arr[index].length; index1++) {
+      for (let index2 = 0; index2 < arr[index + 1].length; index2++) {
+        if (arr[index][index1] < arr[index + 1][index2]) {
+          return true
+        }
+      }
+    }
+  }
+  return false
+}
 
 function nearNumberArray (arr1, arr2) {
   const rangesArray = new Array()
