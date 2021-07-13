@@ -757,8 +757,16 @@ wsClient.on('connection', async (client, data) => {
                   symbolsRangeAverage,
                   tmpProduct: product
                 }
+
+                Object.defineProperty(product, 'symbolsRangeAverage', {
+                  enumerable: true,
+                  configurable: true,
+                  writable: true,
+                  value: symbolsRangeAverage
+                })
+
                 console.log(productName, symbolsRangeAverage)
-                resultArray.push(resProduct)
+                resultArray.push(product)
               }
             }
           }
