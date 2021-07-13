@@ -925,7 +925,7 @@ function regExpGenerate (productName, str) {
     console.log(regExpression)
     result.push({result: productName.match(regExpression), expression: regExpression})
   })
-
+  console.log(result)
   result.sort((a, b) => a.result.length - b.result.length)
 
   console.log('regExp gen: ', result[0].expression)
