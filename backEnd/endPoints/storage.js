@@ -760,7 +760,8 @@ wsClient.on('connection', async (client, data) => {
                   tmpProduct: product
                 }
 
-                resultArray.push(resProduct)
+                if (symbolsRangeAverage <= 10)
+                  resultArray.push(resProduct)
               }
             }
           }
