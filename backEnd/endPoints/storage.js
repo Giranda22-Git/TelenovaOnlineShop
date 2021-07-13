@@ -926,16 +926,9 @@ function regExpGenerate (productName, str) {
     result.push({result: productName.match(regExpression), expression: regExpression})
   })
 
-  let tmpResult = result
-  let deleteCount = 0
-  result.forEach((element, index) => {
-    if (!element.result) {
-      tmpResult.splice(index - deleteCount, 1)
-      deleteCount++
-    }
+  result = result.filter(element => {
+    return element.result
   })
-
-  result = tmpResult
 
   console.log(result)
 
