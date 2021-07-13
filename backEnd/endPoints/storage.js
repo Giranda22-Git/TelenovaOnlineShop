@@ -759,8 +759,9 @@ wsClient.on('connection', async (client, data) => {
                   symbolsRangeAverage,
                   tmpProduct: product
                 }
-
-                resultArray.push(resProduct)
+                if (symbolsRangeAverage <= 3) {
+                  resultArray.push(resProduct)
+                }
               }
             }
           }
