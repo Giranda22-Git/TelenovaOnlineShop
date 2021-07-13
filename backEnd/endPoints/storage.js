@@ -706,6 +706,7 @@ wsClient.on('connection', async (client, data) => {
 
             queryArray.forEach(symbol => {
               if (productName.includes(symbol)) {
+                console.log(symbol)
                 coincidence++
                 cutedQuery += symbol
               }
