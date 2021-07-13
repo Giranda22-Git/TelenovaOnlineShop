@@ -898,6 +898,7 @@ function isStrictOrder (arr) {
   for (let index = 0; index < arr.length - 1; index++) {
     for (let index1 = 0; index1 < arr[index].length; index1++) {
       for (let index2 = 0; index2 < arr[index + 1].length; index2++) {
+        console.log('check strict: ', arr[index][index1], ' < ', arr[index + 1][index2], arr[index][index1] < arr[index + 1][index2])
         if (arr[index][index1] < arr[index + 1][index2]) {
           return true
         }
