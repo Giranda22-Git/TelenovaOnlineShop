@@ -694,7 +694,7 @@ wsClient.on('connection', async (client, data) => {
         const resultArray = new Array()
         const fullSameProducts = new Array()
         shop.forEach(product => {
-          const productName = product.offerData.name.toLowerCase()
+          let productName = product.offerData.name.toLowerCase()
           let coincidence = 0
           // productName.includes(data.query.toLowerCase())
 
@@ -721,10 +721,10 @@ wsClient.on('connection', async (client, data) => {
               console.log('result: ', productName, resultRegExp)
 
               if (resultRegExp) {
-                const workQuery = resultRegExp[0].split('')
+                productName = resultRegExp[0].split('')
                 const symbolIndices = new Array()
-                console.log(workQuery)
-                workQuery.forEach(symbol => {
+
+                cutedQuery.forEach(symbol => {
                   symbolIndices.push(findIndices(productName, symbol))
                 })
 
