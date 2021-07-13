@@ -934,11 +934,13 @@ function regExpGenerate (productName, str) {
 
   result.sort((a, b) => a.result.length - b.result.length)
 
-  console.log('regExp gen: ', result[0].expression)
-  if (result.length === 0)
+  if (result.length === 0) {
     return str.split('').join('.*')
-  else
+  }
+  else {
+    console.log(result[0].expression)
     return result[0].expression
+  }
 }
 
 function getListIdx(str, substr) {
