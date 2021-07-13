@@ -721,6 +721,7 @@ wsClient.on('connection', async (client, data) => {
               console.log('result: ', productName, resultRegExp)
 
               if (resultRegExp) {
+                cutedQuery = cutedQuery.split('')
                 productName = resultRegExp[0].split('')
                 const symbolIndices = new Array()
 
