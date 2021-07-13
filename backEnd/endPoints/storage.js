@@ -750,7 +750,7 @@ wsClient.on('connection', async (client, data) => {
                 let symbolsRangeAverage = arraySum(symbolsRangeArray) / symbolIndices.length
 
                 if (symbolsRangeAverage < 0) {
-                  symbolsRangeAverage *= -1
+                  symbolsRangeAverage *= -1 * Math.PI
                 }
 
                 const resProduct = {
@@ -758,16 +758,6 @@ wsClient.on('connection', async (client, data) => {
                   tmpProduct: product
                 }
 
-                shop[shopIndex].symbolsRangeAverage = symbolsRangeAverage
-
-                console.log(shop[shopIndex])
-                // const newProduct = {}
-                // for (const productKey in product) {
-                //   newProduct[productKey] = product[productKey]
-                // }
-                // newProduct.symbolsRangeAverage = symbolsRangeAverage
-
-                // console.log(newProduct.symbolsRangeAverage)
                 resultArray.push(resProduct)
               }
             }
