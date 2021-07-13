@@ -853,7 +853,9 @@ wsClient.on('connection', async (client, data) => {
           }
         }
 
-        allProducts.push(new Array(shop))
+        shop.forEach(element => {
+          allProducts.push(element)
+        })
       }
       console.log('allProducts: ', allProducts)
       allProducts.sort(function (a, b) {
