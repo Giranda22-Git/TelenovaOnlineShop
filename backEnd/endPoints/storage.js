@@ -853,18 +853,18 @@ wsClient.on('connection', async (client, data) => {
           }
         }
 
-        allProducts = shop
+        allProducts = new Array(shop)
       }
 
-      // allProducts.sort(function (a, b) {
-      //   if (a.offerData.price < b.offerData.price) {
-      //     return -1
-      //   }
-      //   if (a.offerData.price > b.offerData.price) {
-      //     return 1
-      //   }
-      //   return 0
-      // })
+      allProducts.sort(function (a, b) {
+        if (a.offerData.price < b.offerData.price) {
+          return -1
+        }
+        if (a.offerData.price > b.offerData.price) {
+          return 1
+        }
+        return 0
+      })
       const finishAnswer = {
         priceRange: [allProducts[0].offerData.price, allProducts[allProducts.length - 1].offerData.price],
         filterKeys,
