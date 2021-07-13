@@ -757,15 +757,15 @@ wsClient.on('connection', async (client, data) => {
                   symbolsRangeAverage,
                   tmpProduct: product
                 }
-                const newProduct = new Object()
-                for (const productKey in product) {
-                  newProduct[productKey] = product[productKey]
-                }
-                newProduct.symbolsRangeAverage = symbolsRangeAverage
+                // const newProduct = new Object()
+                // for (const productKey in product) {
+                //   newProduct[productKey] = product[productKey]
+                // }
+                // newProduct.symbolsRangeAverage = symbolsRangeAverage
 
-                console.log(newProduct, symbolsRangeAverage)
-
-                resultArray.push(newProduct)
+                // console.log(newProduct, symbolsRangeAverage)
+                console.log(resProduct)
+                resultArray.push(resProduct)
               }
             }
           }
