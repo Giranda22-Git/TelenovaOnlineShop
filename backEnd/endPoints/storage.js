@@ -702,19 +702,29 @@ wsClient.on('connection', async (client, data) => {
             fullSameProducts.push(product)
             console.log('unshift', productName)
           } else {
+            let cutedQuery = ''
+
             queryArray.forEach(symbol => {
-              if (productName.includes(symbol))
+              if (productName.includes(symbol)) {
                 coincidence++
+                cutedQuery += symbol
+              }
             })
+            console.log('cutedQuery: ', cutedQuery)
 
             const result = (coincidence / queryArray.length) * 100
 
             if (result >= 80) {
 
+              const resultRegExp = productName.match(new RegExp(regExpGenerate(cutedQuery)))
+
+              console.log('result: ', productName, resultRegExp)
+
+              if (resultRegExp) {
+                const workQuery = resultRegExp[0]
                 const symbolIndices = new Array()
-                const resultRegExp = productName.match(new RegExp(regExpGenerate(queryArray.join(''))))
-                console.log('result: ', productName, resultRegExp)
-                queryArray.forEach(symbol => {
+
+                workQuery.forEach(symbol => {
                   symbolIndices.push(findIndices(productName, symbol))
                 })
 
@@ -723,17 +733,15 @@ wsClient.on('connection', async (client, data) => {
                     symbolIndices.splice(index, 1)
                   }
                 })
-
-                if (resultRegExp) {
-
+                console.log('indices: ', productName, symbolIndices)
                 const symbolsRangeArray = new Array()
 
                 for (let index = 1; index < symbolIndices.length; index++) {
                   const result = nearNumberArray(symbolIndices[index - 1], symbolIndices[index])
-                  console.log('Range generate first: ', symbolIndices)
+
                   symbolIndices[index - 1] = [result.first]
                   symbolIndices[index] = [result.second]
-                  console.log('Range generate second: ', symbolIndices)
+
                   if (symbolIndices[index - 1][0] < symbolIndices[index][0]) {
                     symbolsRangeArray.push(symbolIndices[index][0] - symbolIndices[index - 1][0])
                   } else {
@@ -746,7 +754,6 @@ wsClient.on('connection', async (client, data) => {
                   symbolsRangeAverage,
                   tmpProduct: product
                 }
-                console.log(product.offerData.name, symbolsRangeAverage)
 
                 resultArray.push(resProduct)
               }
