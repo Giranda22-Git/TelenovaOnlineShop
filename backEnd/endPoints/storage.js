@@ -716,7 +716,7 @@ wsClient.on('connection', async (client, data) => {
 
             if (result >= 80) {
 
-              const resultRegExp = productName.match(new RegExp(regExpGenerate(cutedQuery)))
+              const resultRegExp = productName.match(new RegExp(regExpGenerate(productName, cutedQuery)))
 
               console.log('result: ', productName, resultRegExp)
 
@@ -903,25 +903,42 @@ content-type: application/json
 
 */
 
-function isStrictOrder (arr) {
-  const boolArray = new Array()
-  for (let index = 0; index < arr.length - 1; index++) {
-    for (let index1 = 0; index1 < arr[index].length; index1++) {
-      for (let index2 = 0; index2 < arr[index + 1].length; index2++) {
-        console.log('check strict: ', arr[index][index1], ' < ', arr[index + 1][index2], arr[index][index1] < arr[index + 1][index2])
-        if (arr[index][index1] < arr[index + 1][index2]) {
-          boolArray.push(true)
-        }
-      }
-    }
-  }
-  return false
+String.prototype.replaceAt = function(index, replacement) {
+  return this.substr(0, index) + replacement + this.substr(index + replacement.length)
 }
 
-function regExpGenerate (str) {
-  const result = str.split('').join('.*')
-  console.log('regExp gen: ', result)
-  return result
+function regExpGenerate (productName, str) {
+  const result = new Array()
+
+  const regExpression = str.split('').join('.*')
+
+  result.push({result: productName.match(regExpression), expression: regExpression})
+
+  getListIdx(regExpression, '*').forEach(element => {
+    const tmpRegExpression = regExpression.replaceAt(element, '?')
+    console.log(tmpRegExpression)
+    result.push({result: productName.match(tmpRegExpression), expression: tmpRegExpression})
+  })
+
+  getListIdx(regExpression, '*').forEach(element => {
+    regExpression = regExpression.replaceAt(element, '?')
+    console.log(regExpression)
+    result.push({result: productName.match(regExpression), expression: regExpression})
+  })
+
+  result.sort((a, b) => a.result.length - b.result.length)
+
+  console.log('regExp gen: ', result[0].expression)
+  return result[0].expression
+}
+
+function getListIdx(str, substr) {
+  let listIdx = []
+  let lastIndex = -1
+  while ((lastIndex = str.indexOf(substr, lastIndex + 1)) !== -1) {
+    listIdx.push(lastIndex)
+  }
+  return listIdx
 }
 
 function nearNumberArray (arr1, arr2) {
