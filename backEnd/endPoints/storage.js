@@ -747,7 +747,7 @@ wsClient.on('connection', async (client, data) => {
                   }
                 }
 
-                let symbolsRangeAverage = arraySum(symbolsRangeArray) / symbolIndices.length
+                let symbolsRangeAverage = arraySum(symbolsRangeArray) / cutedQuery.length
 
                 if (symbolsRangeAverage < 0) {
                   symbolsRangeAverage *= -1
