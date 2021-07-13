@@ -764,12 +764,12 @@ wsClient.on('connection', async (client, data) => {
                 // newProduct.symbolsRangeAverage = symbolsRangeAverage
 
                 // console.log(newProduct, symbolsRangeAverage)
-                console.log(resProduct)
                 resultArray.push(resProduct)
               }
             }
           }
         })
+        console.log('start: ', resultArray)
         resultArray.sort(function (a, b) {
           if (a.symbolsRangeAverage < b.symbolsRangeAverage) {
             return 1
@@ -779,7 +779,7 @@ wsClient.on('connection', async (client, data) => {
           }
           return 0
         })
-
+        console.log('end: ', resultArray)
         const finishAnswerArray = new Array()
 
         resultArray.forEach(element => {
