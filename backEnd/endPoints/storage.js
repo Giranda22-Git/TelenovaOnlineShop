@@ -711,7 +711,7 @@ wsClient.on('connection', async (client, data) => {
               }
             })
 
-            console.log(cutedQuery)
+            console.log(productName, cutedQuery)
 
             const result = (coincidence / queryArray.length) * 100
 
