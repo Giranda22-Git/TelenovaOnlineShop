@@ -841,32 +841,32 @@ wsClient.on('connection', async (client, data) => {
           }
         }
       } else {
-        // for (const product of shop) {
-        //   for (const property of Object.keys(product.offerData.properties)) {
-        //     if (!(Object.keys(filterKeys).includes(property))) {
-        //       filterKeys[property] = new Array()
-        //     }
+        for (const product of shop) {
+          for (const property of Object.keys(product.offerData.properties)) {
+            if (!(Object.keys(filterKeys).includes(property))) {
+              filterKeys[property] = new Array()
+            }
 
-        //     if (!(filterKeys[property].includes(product.offerData.properties[property]))) {
-        //       filterKeys[property].push(product.offerData.properties[property])
-        //     }
-        //   }
-        // }
+            if (!(filterKeys[property].includes(product.offerData.properties[property]))) {
+              filterKeys[property].push(product.offerData.properties[property])
+            }
+          }
+        }
 
-        // allProducts = shop
+        allProducts = shop
       }
 
-      // allProducts.sort(function (a, b) {
-      //   if (a.offerData.price < b.offerData.price) {
-      //     return -1
-      //   }
-      //   if (a.offerData.price > b.offerData.price) {
-      //     return 1
-      //   }
-      //   return 0
-      // })
+      allProducts.sort(function (a, b) {
+        if (a.offerData.price < b.offerData.price) {
+          return -1
+        }
+        if (a.offerData.price > b.offerData.price) {
+          return 1
+        }
+        return 0
+      })
       const finishAnswer = {
-        // priceRange: [allProducts[0].offerData.price, allProducts[allProducts.length - 1].offerData.price],
+        priceRange: [allProducts[0].offerData.price, allProducts[allProducts.length - 1].offerData.price],
         filterKeys,
         products: shop
       }
