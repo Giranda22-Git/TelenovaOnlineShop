@@ -712,7 +712,7 @@ wsClient.on('connection', async (client, data) => {
             if (result >= 80) {
 
                 const symbolIndices = new Array()
-
+                console.log('result: ', productName.match(new RegExp(regExpGenerate(queryArray.join()))))
                 queryArray.forEach(symbol => {
                   symbolIndices.push(findIndices(productName, symbol))
                 })
@@ -895,17 +895,24 @@ content-type: application/json
 */
 
 function isStrictOrder (arr) {
+  const boolArray = new Array()
   for (let index = 0; index < arr.length - 1; index++) {
     for (let index1 = 0; index1 < arr[index].length; index1++) {
       for (let index2 = 0; index2 < arr[index + 1].length; index2++) {
         console.log('check strict: ', arr[index][index1], ' < ', arr[index + 1][index2], arr[index][index1] < arr[index + 1][index2])
         if (arr[index][index1] < arr[index + 1][index2]) {
-          return true
+          boolArray.push(true)
         }
       }
     }
   }
   return false
+}
+
+function regExpGenerate (str) {
+  const result = '/' + str.split('').join('.*') + '/'
+  console.log('regExp gen: ', result)
+  return result
 }
 
 function nearNumberArray (arr1, arr2) {
