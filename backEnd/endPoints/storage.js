@@ -757,7 +757,7 @@ wsClient.on('connection', async (client, data) => {
                   symbolsRangeAverage,
                   tmpProduct: product
                 }
-                const newProduct = new Object()
+                const newProduct = {}
                 for (const productKey in product) {
                   newProduct[productKey] = product[productKey]
                 }
