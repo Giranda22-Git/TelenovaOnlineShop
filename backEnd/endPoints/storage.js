@@ -721,7 +721,7 @@ wsClient.on('connection', async (client, data) => {
               console.log('result: ', productName, resultRegExp)
 
               if (resultRegExp) {
-                const workQuery = resultRegExp[0]
+                const workQuery = resultRegExp[0].split('')
                 const symbolIndices = new Array()
                 console.log(workQuery)
                 workQuery.forEach(symbol => {
