@@ -927,7 +927,11 @@ function regExpGenerate (productName, str) {
   })
   console.log(result)
 
-
+  result.forEach((element, index) => {
+    if (!element.result) {
+      result.splice(index, 1)
+    }
+  })
 
   result.sort((a, b) => a.result.length - b.result.length)
 
