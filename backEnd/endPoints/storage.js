@@ -712,7 +712,8 @@ wsClient.on('connection', async (client, data) => {
             if (result >= 80) {
 
                 const symbolIndices = new Array()
-                console.log('result: ', productName.match(new RegExp(regExpGenerate(queryArray.join('')))))
+                const resultRegExp = productName.match(new RegExp(regExpGenerate(queryArray.join(''))))
+                console.log('result: ', productName, resultRegExp)
                 queryArray.forEach(symbol => {
                   symbolIndices.push(findIndices(productName, symbol))
                 })
@@ -723,7 +724,7 @@ wsClient.on('connection', async (client, data) => {
                   }
                 })
 
-                if (isStrictOrder(symbolIndices)) {
+                if (resultRegExp) {
 
                 const symbolsRangeArray = new Array()
 
