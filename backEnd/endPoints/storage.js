@@ -911,7 +911,7 @@ function regExpGenerate (productName, str) {
   const result = new Array()
 
   let regExpression = str.split('').join('.*')
-
+  console.log(productName)
   result.push({result: productName.match(regExpression), expression: regExpression})
 
   getListIdx(regExpression, '*').forEach(element => {
@@ -926,6 +926,9 @@ function regExpGenerate (productName, str) {
     result.push({result: productName.match(regExpression), expression: regExpression})
   })
   console.log(result)
+
+
+
   result.sort((a, b) => a.result.length - b.result.length)
 
   console.log('regExp gen: ', result[0].expression)
