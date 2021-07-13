@@ -910,7 +910,7 @@ String.prototype.replaceAt = function(index, replacement) {
 function regExpGenerate (productName, str) {
   const result = new Array()
 
-  const regExpression = str.split('').join('.*')
+  let regExpression = str.split('').join('.*')
 
   result.push({result: productName.match(regExpression), expression: regExpression})
 
