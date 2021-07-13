@@ -778,23 +778,23 @@ wsClient.on('connection', async (client, data) => {
           }
           return 0
         })
-        console.log(resultArray)
+
         const finishAnswerArray = new Array()
 
-        resultArray.forEach(element => {
-          if (Object.keys(element).includes('tmpProduct')) {
-            finishAnswerArray.push(element.tmpProduct)
-          } else {
-            finishAnswerArray.push(element)
-          }
-        })
+        // resultArray.forEach(element => {
+        //   if (Object.keys(element).includes('tmpProduct')) {
+        //     finishAnswerArray.push(element.tmpProduct)
+        //   } else {
+        //     finishAnswerArray.push(element)
+        //   }
+        // })
 
-        if (fullSameProducts.length !== 0) {
-          fullSameProducts.forEach(element => {
-            finishAnswerArray.unshift(element)
-          })
-        }
-
+        // if (fullSameProducts.length !== 0) {
+        //   fullSameProducts.forEach(element => {
+        //     finishAnswerArray.unshift(element)
+        //   })
+        // }
+        console.log(finishAnswerArray)
         shop = finishAnswerArray
       }
 
