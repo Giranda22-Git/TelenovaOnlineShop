@@ -723,7 +723,7 @@ wsClient.on('connection', async (client, data) => {
               if (resultRegExp) {
                 const workQuery = resultRegExp[0]
                 const symbolIndices = new Array()
-
+                console.log(workQuery)
                 workQuery.forEach(symbol => {
                   symbolIndices.push(findIndices(productName, symbol))
                 })
