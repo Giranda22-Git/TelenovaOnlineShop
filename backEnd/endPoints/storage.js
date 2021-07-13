@@ -853,7 +853,7 @@ wsClient.on('connection', async (client, data) => {
           }
         }
 
-        allProducts = new Array(shop)
+        allProducts.push(new Array(shop))
       }
       console.log('allProducts: ', allProducts)
       allProducts.sort(function (a, b) {
