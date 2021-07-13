@@ -855,7 +855,7 @@ wsClient.on('connection', async (client, data) => {
 
         allProducts = new Array(shop)
       }
-
+      console.log('allProducts: ', allProducts)
       allProducts.sort(function (a, b) {
         if (a.offerData.price < b.offerData.price) {
           return -1
