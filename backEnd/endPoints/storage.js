@@ -790,7 +790,7 @@ wsClient.on('connection', async (client, data) => {
             finishAnswerArray.unshift(element)
           })
         }
-
+        console.log(finishAnswerArray)
         shop = finishAnswerArray
       }
 
