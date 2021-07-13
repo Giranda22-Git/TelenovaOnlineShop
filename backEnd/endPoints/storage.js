@@ -930,7 +930,7 @@ function regExpGenerate (productName, str) {
     return element.result
   })
 
-  console.log(result)
+  console.log('allResults: ', result)
 
   result.sort((a, b) => a.result.length - b.result.length)
 
@@ -938,7 +938,7 @@ function regExpGenerate (productName, str) {
     return str.split('').join('.*')
   }
   else {
-    console.log(result[0].expression)
+    console.log('finishResult: ', result[0].expression)
     return result[0].expression
   }
 }
