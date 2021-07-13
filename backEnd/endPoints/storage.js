@@ -693,7 +693,7 @@ wsClient.on('connection', async (client, data) => {
         const queryArray = data.query.toLowerCase().split('')
         const resultArray = new Array()
         const fullSameProducts = new Array()
-        shop.forEach((product, shopIndex) => {
+        shop.forEach((product) => {
           let productName = product.offerData.kaspi_name.toLowerCase()
           let coincidence = 0
           // productName.includes(data.query.toLowerCase())
@@ -716,7 +716,7 @@ wsClient.on('connection', async (client, data) => {
             if (result >= 80) {
 
               const resultRegExp = productName.match(new RegExp(regExpGenerate(productName, cutedQuery)))
-              console.log(resultRegExp, productName)
+              console.log(resultRegExp, productName, cutedQuery)
               if (resultRegExp) {
                 cutedQuery = cutedQuery.split('')
                 productName = resultRegExp[0].split('')
