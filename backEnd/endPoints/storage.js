@@ -747,7 +747,12 @@ wsClient.on('connection', async (client, data) => {
                   }
                 }
 
-                const symbolsRangeAverage = arraySum(symbolsRangeArray) / symbolIndices.length
+                let symbolsRangeAverage = arraySum(symbolsRangeArray) / symbolIndices.length
+
+                if (symbolsRangeAverage < 0) {
+                  symbolsRangeAverage = ~symbolsRangeAverage
+                }
+
                 const resProduct = {
                   symbolsRangeAverage,
                   tmpProduct: product
