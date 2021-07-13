@@ -763,7 +763,7 @@ wsClient.on('connection', async (client, data) => {
                 }
                 newProduct.symbolsRangeAverage = symbolsRangeAverage
 
-                console.log(newProduct.symbolsRangeAverage, symbolsRangeAverage)
+                console.log(newProduct, symbolsRangeAverage)
 
                 resultArray.push(newProduct)
               }
@@ -795,7 +795,7 @@ wsClient.on('connection', async (client, data) => {
             finishAnswerArray.unshift(element)
           })
         }
-        console.log(finishAnswerArray)
+
         shop = finishAnswerArray
       }
 
