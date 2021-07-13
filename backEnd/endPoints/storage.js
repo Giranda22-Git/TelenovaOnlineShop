@@ -694,7 +694,7 @@ wsClient.on('connection', async (client, data) => {
         const resultArray = new Array()
         const fullSameProducts = new Array()
         shop.forEach((product, shopIndex) => {
-          let productName = product.offerData.name.toLowerCase()
+          let productName = product.offerData.kaspi_name.toLowerCase()
           let coincidence = 0
           // productName.includes(data.query.toLowerCase())
 
