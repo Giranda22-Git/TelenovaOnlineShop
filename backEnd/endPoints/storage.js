@@ -757,13 +757,13 @@ wsClient.on('connection', async (client, data) => {
                   symbolsRangeAverage,
                   tmpProduct: product
                 }
-                const newProduct = {}
-                for (const productKey in product) {
-                  newProduct[productKey] = product[productKey]
-                }
-                newProduct.symbolsRangeAverage = symbolsRangeAverage
+                // const newProduct = {}
+                // for (const productKey in product) {
+                //   newProduct[productKey] = product[productKey]
+                // }
+                // newProduct.symbolsRangeAverage = symbolsRangeAverage
 
-                console.log(newProduct.symbolsRangeAverage)
+                // console.log(newProduct.symbolsRangeAverage)
                 resultArray.push(resProduct)
               }
             }
@@ -778,6 +778,7 @@ wsClient.on('connection', async (client, data) => {
           }
           return 0
         })
+        console.log(resultArray)
         const finishAnswerArray = new Array()
 
         resultArray.forEach(element => {
