@@ -911,7 +911,7 @@ function isStrictOrder (arr) {
 }
 
 function regExpGenerate (str) {
-  const result = '/' + str.split('').join('.*') + '/'
+  const result = str.split('').join('.*')
   console.log('regExp gen: ', result)
   return result
 }
