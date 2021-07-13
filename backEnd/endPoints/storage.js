@@ -710,15 +710,12 @@ wsClient.on('connection', async (client, data) => {
                 cutedQuery += symbol
               }
             })
-            console.log('cutedQuery: ', cutedQuery)
 
             const result = (coincidence / queryArray.length) * 100
 
             if (result >= 80) {
 
               const resultRegExp = productName.match(new RegExp(regExpGenerate(productName, cutedQuery)))
-
-              console.log('result: ', productName, resultRegExp)
 
               if (resultRegExp) {
                 cutedQuery = cutedQuery.split('')
@@ -734,7 +731,7 @@ wsClient.on('connection', async (client, data) => {
                     symbolIndices.splice(index, 1)
                   }
                 })
-                console.log('indices: ', productName, symbolIndices)
+
                 const symbolsRangeArray = new Array()
 
                 for (let index = 1; index < symbolIndices.length; index++) {
@@ -755,6 +752,8 @@ wsClient.on('connection', async (client, data) => {
                   symbolsRangeAverage,
                   tmpProduct: product
                 }
+
+                console.log(productName, symbolsRangeAverage)
 
                 resultArray.push(resProduct)
               }
@@ -911,18 +910,16 @@ function regExpGenerate (productName, str) {
   let result = new Array()
 
   let regExpression = str.split('').join('.*')
-  console.log(productName)
+
   result.push({result: productName.match(regExpression), expression: regExpression})
 
   getListIdx(regExpression, '*').forEach(element => {
     const tmpRegExpression = regExpression.replaceAt(element, '?')
-    console.log(tmpRegExpression)
     result.push({result: productName.match(tmpRegExpression), expression: tmpRegExpression})
   })
 
   getListIdx(regExpression, '*').forEach(element => {
     regExpression = regExpression.replaceAt(element, '?')
-    console.log(regExpression)
     result.push({result: productName.match(regExpression), expression: regExpression})
   })
 
@@ -932,13 +929,10 @@ function regExpGenerate (productName, str) {
 
   result.sort((a, b) => a.result.length - b.result.length)
 
-  console.log('allResults: ', result)
-
   if (result.length === 0) {
     return str.split('').join('.*')
   }
   else {
-    console.log('finishResult: ', result[0].expression)
     return result[0].expression
   }
 }
