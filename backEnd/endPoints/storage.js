@@ -693,7 +693,7 @@ wsClient.on('connection', async (client, data) => {
         const queryArray = data.query.toLowerCase().split('')
         const resultArray = new Array()
         const fullSameProducts = new Array()
-        shop.forEach(product => {
+        shop.forEach((product, shopIndex) => {
           let productName = product.offerData.name.toLowerCase()
           let coincidence = 0
           // productName.includes(data.query.toLowerCase())
@@ -757,6 +757,10 @@ wsClient.on('connection', async (client, data) => {
                   symbolsRangeAverage,
                   tmpProduct: product
                 }
+
+                shop[shopIndex].symbolsRangeAverage = symbolsRangeAverage
+
+                console.log(shop[shopIndex])
                 // const newProduct = {}
                 // for (const productKey in product) {
                 //   newProduct[productKey] = product[productKey]
