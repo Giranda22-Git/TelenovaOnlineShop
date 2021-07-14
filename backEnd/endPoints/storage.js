@@ -236,7 +236,9 @@ router.get('/mostPopular/products/:count', async (req, res) => {
         category_list: el.offerData.category_list,
         images: el.offerData.images.slice(0,1),
         name: el.offerData.name,
-        price: el.offerData.price
+        price: el.offerData.price,
+        kaspi_id: el.offerData.kaspi_id,
+        kaspi_rating: el.offerData.kaspi_rating
       }
     }
   });
