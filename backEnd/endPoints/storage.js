@@ -228,10 +228,18 @@ router.get('/mostPopular/products/:count', async (req, res) => {
   })
 
   allProducts = allProducts.slice(0, req.params.count)
-  allProducts.forEach( el => {
-    el.offerData.additional_properties = {}
-    el.offerData.properties = {}
-  })
+
+  allProducts = allProducts.map(function(el) {
+    return {
+      _id: el._id,
+      offerData: {
+        category_list: el.offerData.category_list,
+        images: el.offerData.images.slice(0,1),
+        name: el.offerData.name,
+        price: el.offerData.price
+      }
+    }
+  });
 
   res.json(allProducts)
 })
@@ -345,8 +353,7 @@ router.get('/mostPopular/freshProducts/:count', async (req, res) => {
 
   allProducts = allProducts.slice(0, req.params.count)
   allProducts.forEach( el => {
-    el.offerData.additional_properties = {}
-    el.offerData.properties = {}
+    el.offerData.additional_properties = el.offerData.properties = {}
   })
   res.json(allProducts)
 })
@@ -579,8 +586,7 @@ router.post('/getGoods/categories', async (req, res) => {
   if (data.count) {
     shop = shop.slice(0, data.count)
     shop.forEach( el => {
-      el.offerData.additional_properties = {}
-      el.offerData.properties = {}
+      el.offerData.additional_properties = el.offerData.properties = {}
     })
   }
 
@@ -875,8 +881,7 @@ wsClient.on('connection', async (client, data) => {
         return 0
       })
       shop.forEach( el => {
-        el.offerData.additional_properties = {}
-        el.offerData.properties = {}
+        el.offerData.additional_properties = el.offerData.properties = {}
       })
       const finishAnswer = {
         priceRange: [allProducts[0].offerData.price, allProducts[allProducts.length - 1].offerData.price],
