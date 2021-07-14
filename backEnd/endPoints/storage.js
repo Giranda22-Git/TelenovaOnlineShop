@@ -874,6 +874,10 @@ wsClient.on('connection', async (client, data) => {
         }
         return 0
       })
+      shop.forEach( el => {
+        el.offerData.additional_properties = {}
+        el.offerData.properties = {}
+      })
       const finishAnswer = {
         priceRange: [allProducts[0].offerData.price, allProducts[allProducts.length - 1].offerData.price],
         filterKeys,
