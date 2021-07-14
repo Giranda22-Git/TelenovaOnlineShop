@@ -310,15 +310,7 @@ content-type: application/json
 router.get('/mostPopular/freshProducts/:count', async (req, res) => {
   let allProducts = await mongoStorage.find().exec()
 
-  allProducts.sort(function (a, b) {
-    if (a.dateOfCreature < b.dateOfCreature) {
-      return -1
-    }
-    if (a.dateOfCreature > b.dateOfCreature) {
-      return 1
-    }
-    return 0
-  })
+  allProducts.sort((a, b) => b - a)
 
   allProducts = allProducts.slice(0, req.params.count)
   allProducts = allProducts.map(function(el) {
