@@ -228,10 +228,6 @@ router.get('/mostPopular/products/:count', async (req, res) => {
   })
 
   allProducts = allProducts.slice(0, req.params.count)
-  allProducts.foreach( el => {
-    el.offerData.additional_properties = {}
-    el.offerData.properties = {}
-  })
 
   res.json(allProducts)
 })
@@ -344,10 +340,6 @@ router.get('/mostPopular/freshProducts/:count', async (req, res) => {
   })
 
   allProducts = allProducts.slice(0, req.params.count)
-  allProducts.foreach( el => {
-    el.offerData.additional_properties = {}
-    el.offerData.properties = {}
-  })
   res.json(allProducts)
 })
 /*
@@ -578,10 +570,6 @@ router.post('/getGoods/categories', async (req, res) => {
 
   if (data.count) {
     shop = shop.slice(0, data.count)
-    shop.foreach( el => {
-      el.offerData.additional_properties = {}
-      el.offerData.properties = {}
-    })
   }
 
   res.json({ products: shop })
