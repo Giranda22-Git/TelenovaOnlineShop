@@ -33,8 +33,8 @@ async function init(serverData) {
 		})
 
 		app.use('/storage', require('./endPoints/storage.js'))
-    app.use('/categoryTree', require('./endPoints/tree.js'))
-    app.use('/order', require('./endPoints/order.js'))
+		app.use('/categoryTree', require('./endPoints/tree.js'))
+		app.use('/order', require('./endPoints/order.js'))
 	})
 	mongoose.connection.emit('open')
 }
