@@ -258,7 +258,15 @@ content-type: application/json
 router.get('/mostPopular/firstLevelCategories/:count', async (req, res) => {
   let categoryList = await mongoCategoryList.find({ level: 1 }).exec()
 
-  categoryList.sort((a, b) => a - b)
+  categoryList.sort(function (a, b) {
+    if (a.countOfSold > b.countOfSold) {
+      return -1
+    }
+    if (a.countOfSold < b.countOfSold) {
+      return 1
+    }
+    return 0
+  })
 
   categoryList = categoryList.slice(0, req.params.count)
 
@@ -278,7 +286,15 @@ content-type: application/json
 router.get('/mostPopular/secondLevelCategories/:count', async (req, res) => {
   let categoryList = await mongoCategoryList.find({ level: 2 }).exec()
 
-  categoryList.sort((a, b) => a - b)
+  categoryList.sort(function (a, b) {
+    if (a.countOfSold > b.countOfSold) {
+      return -1
+    }
+    if (a.countOfSold < b.countOfSold) {
+      return 1
+    }
+    return 0
+  })
 
   categoryList = categoryList.slice(0, req.params.count)
 
@@ -298,7 +314,15 @@ content-type: application/json
 router.get('/mostPopular/thirdLevelCategories/:count', async (req, res) => {
   let categoryList = await mongoCategoryList.find({ level: 3 }).exec()
 
-  categoryList.sort((a, b) => a - b)
+  categoryList.sort(function (a, b) {
+    if (a.countOfSold > b.countOfSold) {
+      return -1
+    }
+    if (a.countOfSold < b.countOfSold) {
+      return 1
+    }
+    return 0
+  })
 
   categoryList = categoryList.slice(0, req.params.count)
 
