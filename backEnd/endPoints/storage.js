@@ -10,12 +10,12 @@ const mongoCategoryList = require('../models/CategoryList.js').mongoCategoryList
 
 const nearNumber = (arr, number) =>
   arr.map(it => {
-      const ch = (it >= 0 ? it : -it) + number;
-      return {
-        base: it,
-        result: ch >= 0 ? ch : -ch
-      };
-    }).sort((a, b) => { return a.result - b.result && a.result > b.result })[0]
+    const ch = (it >= 0 ? it : -it) + number;
+    return {
+      base: it,
+      result: ch >= 0 ? ch : -ch
+    };
+  }).sort((a, b) => a.result - b.result && a.result > b.result)[0]
 
 async function addFirstLevelCategoryTree(firstCategory) {
   const isExists = await mongoCategoryTree.findOne({ trigger: 'current' })
@@ -217,15 +217,7 @@ content-type: application/json
 router.get('/mostPopular/products/:count', async (req, res) => {
   let allProducts = await mongoStorage.find().exec()
 
-  allProducts.sort(function (a, b) {
-    if (a.countOfSold > b.countOfSold) {
-      return -1
-    }
-    if (a.countOfSold < b.countOfSold) {
-      return 1
-    }
-    return 0
-  })
+  allProducts.sort((a, b) => a - b)
 
   allProducts = allProducts.slice(0, req.params.count)
 
