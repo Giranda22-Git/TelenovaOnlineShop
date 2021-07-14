@@ -897,7 +897,7 @@ wsClient.on('connection', async (client, data) => {
         }
         return 0
       })
-      allProducts = allProducts.map(function(el) {
+      shop = shop.map(function(el) {
         return {
           offerData: {
             category_list: el.offerData.category_list,
