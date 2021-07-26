@@ -624,7 +624,13 @@ wsClient.on('connection', async (client, data) => {
         active: true,
         salePrice: true,
         sale: true,
-        offerData: true
+        'offerData.category_list': true,
+        'offerData.images': true,
+        'offerData.name': true,
+        'offerData.price': true,
+        'offerData.kaspi_id': true,
+        'offerData.kaspi_rating': true,
+        'offerData.properties': true
       }).lean().exec()
 
       if (data.filters) {
