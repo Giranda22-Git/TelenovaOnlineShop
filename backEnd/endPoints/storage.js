@@ -620,7 +620,12 @@ wsClient.on('connection', async (client, data) => {
     if (msg.action === 'search') {
       const data = msg.data
 
-      let shop = await mongoStorage.find().exec()
+      let shop = await mongoStorage.find({}, {
+        active: true,
+        salePrice: true,
+        sale: true,
+        offerData: true
+      }).lean().exec()
 
       if (data.filters) {
         for (const key in data.filters) {
