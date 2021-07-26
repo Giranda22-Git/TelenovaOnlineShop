@@ -114,7 +114,7 @@ function array_compare(a, b) {
 
 router.get('/', async (req, res) => {
   const start = new Date().getTime()
-  const result = await mongoStorage.find().exec()
+  const result = await mongoStorage.find().lean().exec()
   const end = new Date().getTime()
   res.status(200).json(result)
   console.log(`SecondWay: ${end - start}ms`)
