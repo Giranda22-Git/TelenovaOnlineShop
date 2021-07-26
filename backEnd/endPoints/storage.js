@@ -615,7 +615,7 @@ wsClient.on('connection', async (client, data) => {
       }
     }
 
-
+    const start = new Date().getTime()
     // begin ws search
     if (msg.action === 'search') {
       const data = msg.data
@@ -890,7 +890,8 @@ wsClient.on('connection', async (client, data) => {
         filterKeys,
         products: shop
       }
-
+      const end = new Date().getTime()
+      console.log(`SecondWay WS: ${end - start}ms`)
       client.send(JSON.stringify(finishAnswer))
     }
   })
