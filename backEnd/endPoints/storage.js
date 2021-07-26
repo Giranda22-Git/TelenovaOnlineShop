@@ -133,7 +133,8 @@ router.post('/addGoods', async (req, res) => {
     } else {
       const tmp = new mongoStorage({
         offerData: offer,
-        dateOfCreature: new Date()
+        dateOfCreature: new Date(),
+        salePrice: offer.price
       })
       await tmp.save()
     }

@@ -75,10 +75,10 @@ router.post('/', upload.array('files', 15), async (req, res) => {
     else if (data.categoryName) {
       const targetCategory = await mongoCategoryList.findOne({ name: data.categoryName }).lean().exec()
       const isUniquePromoAction = await mongoPromoAction.findOne({ categoryName: data.categoryName }).lean().exec()
-
+      console.log(Boolean(targetCategory), Boolean(files), Boolean(!isUniquePromoAction))
       if (targetCategory && files && !isUniquePromoAction) {
         const categoryProducts = await mongoStorage.find({ 'offerData.category_list': { $in: [data.categoryName] } }, { 'offerData.price': true }).lean().exec()
-        console.log(categoryProducts)
+
         categoryProducts.sort((a, b) => a.offerData.price - b.offerData.price)
 
         const promoImages = filesValidation(files, targetCategory.name)
@@ -114,17 +114,13 @@ router.post('/', upload.array('files', 15), async (req, res) => {
   } else {
     let answer = await result.save()
     if (data.productKaspiId) {
-      await mongoStorage.updateOne(
-        { 'offerData.kaspi_id': data.productKaspiId },
-        { $inc: { sale: data.sale } }
-      ).exec()
+
+      await promoActionMiddleware(answer._id, 1, false)
 
       worker.scheduleJob(new Date(data.timeOfPromoEnding), async (y) => {
         console.log(y)
-        await mongoStorage.updateOne(
-          { 'offerData.kaspi_id': data.productKaspiId },
-          { $inc: { sale: -data.sale } }
-        ).exec()
+
+        await promoActionMiddleware(answer._id, -1, false)
 
         deletePromoAction(answer._id)
       })
@@ -132,16 +128,16 @@ router.post('/', upload.array('files', 15), async (req, res) => {
     else if (data.categoryName) {
       const saleProducts = await mongoStorage.find(
         { 'offerData.category_list': { $in: [data.categoryName] } },
-        { 'offerData.kaspi_id': true, _id: false }
+        { 'offerData.kaspi_id': true, 'offerData.price': true, _id: false }
       ).lean().exec()
 
       await mongoPromoAction.updateOne({ _id: answer._id }, { productsSaleArray: saleProducts }).exec()
 
-      await promoActionMiddleware(answer._id, 1)
+      await promoActionMiddleware(answer._id, 1, true)
 
       worker.scheduleJob(new Date(data.timeOfPromoEnding), async (y) => {
         console.log(y)
-        await promoActionMiddleware(answer._id, -1)
+        await promoActionMiddleware(answer._id, -1, true)
 
         deletePromoAction(answer._id)
       })

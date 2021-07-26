@@ -64,19 +64,15 @@ async function restartPromoActionWorkers () {
       if (new Date(promoAction.timeOfPromoEnding) > new Date()) {
         worker.scheduleJob(new Date(promoAction.timeOfPromoEnding), async (y) => {
           console.log(y)
-          await mongoStorage.updateOne(
-            { 'offerData.kaspi_id': promoAction.productKaspiId },
-            { $inc: { sale: -promoAction.sale } }
-          ).exec()
+
+          await promoActionMiddleware(promoAction._id, -1, false)
 
           deletePromoAction(promoAction._id)
         })
         console.log('promo action worker has been reactivated')
       } else {
-        await mongoStorage.updateOne(
-          { 'offerData.kaspi_id': promoAction.productKaspiId },
-          { $inc: { sale: -promoAction.sale } }
-        ).exec()
+
+        await promoActionMiddleware(promoAction._id, -1, false)
 
         deletePromoAction(promoAction._id)
         console.log('promo action worker has been deleted')
@@ -86,14 +82,14 @@ async function restartPromoActionWorkers () {
       if (new Date(promoAction.timeOfPromoEnding) > new Date()) {
         worker.scheduleJob(new Date(promoAction.timeOfPromoEnding), async (y) => {
           console.log(y)
-          await promoActionMiddleware(promoAction._id, -1)
+          await promoActionMiddleware(promoAction._id, -1, true)
 
           deletePromoAction(promoAction._id)
         })
         console.log('promo action worker has been reactivated')
       } else {
 
-        await promoActionMiddleware(promoAction._id, -1)
+        await promoActionMiddleware(promoAction._id, -1, true)
 
         deletePromoAction(promoAction._id)
 
