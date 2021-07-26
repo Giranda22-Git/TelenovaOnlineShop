@@ -733,14 +733,12 @@ wsClient.on('connection', async (client, data) => {
               }
             })
 
-            console.log(productName, cutedQuery)
-
             const result = (coincidence / queryArray.length) * 100
 
             if (result >= 80) {
 
               const resultRegExp = productName.match(new RegExp(regExpGenerate(productName, cutedQuery)))
-              console.log(resultRegExp, productName, cutedQuery)
+
               if (resultRegExp) {
                 cutedQuery = cutedQuery.split('')
                 productName = resultRegExp[0].split('')
@@ -776,8 +774,6 @@ wsClient.on('connection', async (client, data) => {
                 if (symbolsRangeAverage < 0) {
                   symbolsRangeAverage *= -1
                 }
-
-                console.log(productName.join(''), cutedQuery, symbolsRangeAverage)
 
                 const resProduct = {
                   symbolsRangeAverage,
@@ -874,7 +870,7 @@ wsClient.on('connection', async (client, data) => {
           allProducts.push(element)
         })
       }
-      console.log('allProducts: ', allProducts)
+
       allProducts.sort(function (a, b) {
         if (a.offerData.price < b.offerData.price) {
           return -1
