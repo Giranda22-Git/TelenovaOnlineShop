@@ -122,7 +122,8 @@ router.get('/', async (req, res) => {
     'offerData.images': true,
     'offerData.name': true,
     'offerData.price': true,
-    'offerData.kaspi_id': true
+    'offerData.kaspi_id': true,
+    'offerData.kaspi_rating': true
   }).lean().exec()
   const end = new Date().getTime()
   res.status(200).json(result)
@@ -185,6 +186,12 @@ router.post('/deleteAllGoods', async (req, res) => {
     await mongoStorage.deleteOne({ 'offerData.kaspi_id': item.offerData.kaspi_id })
     await deleteVoidCategoryTree(item.offerData.category_list[0], item.offerData.category_list[1], item.offerData.category_list[2])
   }
+  const categoryTree = await mongoCategoryTree.findOne({ trigger: 'current' }, { tree: true }).lean().exec()
+  if (!(await mongoStorage.countDocuments()) && Object.keys(categoryTree.tree).length !== 0) {
+    await mongoCategoryTree.updateOne({ trigger: 'current' },
+      { tree: new Object() }
+    ).exec()
+  }
 
   console.log('all goods succefull deleted')
 
@@ -229,32 +236,17 @@ content-type: application/json
 // begin get most popular prodcuts
 
 router.get('/mostPopular/products/:count', async (req, res) => {
-  let allProducts = await mongoStorage.find().exec()
-
-  allProducts.sort(function (a, b) {
-    if (a.countOfSold > b.countOfSold) {
-      return -1
-    }
-    if (a.countOfSold < b.countOfSold) {
-      return 1
-    }
-    return 0
-  })
-
-  allProducts = allProducts.slice(0, req.params.count)
-
-  allProducts = allProducts.map(function(el) {
-    return {
-      offerData: {
-        category_list: el.offerData.category_list,
-        images: el.offerData.images.slice(0,1),
-        name: el.offerData.name,
-        price: el.offerData.price,
-        kaspi_id: el.offerData.kaspi_id,
-        kaspi_rating: el.offerData.kaspi_rating
-      }
-    }
-  });
+  const allProducts = await mongoStorage.find({}, {
+    active: true,
+    salePrice: true,
+    sale: true,
+    'offerData.category_list': true,
+    'offerData.images': true,
+    'offerData.name': true,
+    'offerData.price': true,
+    'offerData.kaspi_id': true,
+    'offerData.kaspi_rating': true
+  }).sort({ 'countOfSold': -1 }).limit(Number(req.params.count)).lean().exec()
 
   res.json(allProducts)
 })
@@ -270,19 +262,8 @@ content-type: application/json
 // begin get most popular first level categories
 
 router.get('/mostPopular/firstLevelCategories/:count', async (req, res) => {
-  let categoryList = await mongoCategoryList.find({ level: 1 }).exec()
-
-  categoryList.sort(function (a, b) {
-    if (a.countOfSold > b.countOfSold) {
-      return -1
-    }
-    if (a.countOfSold < b.countOfSold) {
-      return 1
-    }
-    return 0
-  })
-
-  categoryList = categoryList.slice(0, req.params.count)
+  const categoryList = await mongoCategoryList.find({ level: 1 }, { __v: false })
+  .sort({ 'countOfSold': -1 }).limit(Number(req.params.count)).lean().exec()
 
   res.json(categoryList)
 })
@@ -298,19 +279,8 @@ content-type: application/json
 // begin get most popular second level categories
 
 router.get('/mostPopular/secondLevelCategories/:count', async (req, res) => {
-  let categoryList = await mongoCategoryList.find({ level: 2 }).exec()
-
-  categoryList.sort(function (a, b) {
-    if (a.countOfSold > b.countOfSold) {
-      return -1
-    }
-    if (a.countOfSold < b.countOfSold) {
-      return 1
-    }
-    return 0
-  })
-
-  categoryList = categoryList.slice(0, req.params.count)
+  let categoryList = await mongoCategoryList.find({ level: 2 }, { __v: false })
+  .sort({ 'countOfSold': -1 }).limit(Number(req.params.count)).lean().exec()
 
   res.json(categoryList)
 })
@@ -326,19 +296,8 @@ content-type: application/json
 // begin get most popular third level categories
 
 router.get('/mostPopular/thirdLevelCategories/:count', async (req, res) => {
-  let categoryList = await mongoCategoryList.find({ level: 3 }).exec()
-
-  categoryList.sort(function (a, b) {
-    if (a.countOfSold > b.countOfSold) {
-      return -1
-    }
-    if (a.countOfSold < b.countOfSold) {
-      return 1
-    }
-    return 0
-  })
-
-  categoryList = categoryList.slice(0, req.params.count)
+  let categoryList = await mongoCategoryList.find({ level: 3 }, { __v: false })
+  .sort({ 'countOfSold': -1 }).limit(Number(req.params.count)).lean().exec()
 
   res.json(categoryList)
 })
@@ -354,30 +313,18 @@ content-type: application/json
 // begin get new prodcuts
 
 router.get('/mostPopular/freshProducts/:count', async (req, res) => {
-  let allProducts = await mongoStorage.find().exec()
+  let allProducts = await mongoStorage.find({}, {
+    active: true,
+    salePrice: true,
+    sale: true,
+    'offerData.category_list': true,
+    'offerData.images': true,
+    'offerData.name': true,
+    'offerData.price': true,
+    'offerData.kaspi_id': true,
+    'offerData.kaspi_rating': true
+  }).sort({ 'dateOfCreature': -1 }).limit(Number(req.params.count)).lean().exec()
 
-  allProducts.sort(function (a, b) {
-    if (a.dateOfCreature < b.dateOfCreature) {
-      return -1
-    }
-    if (a.dateOfCreature > b.dateOfCreature) {
-      return 1
-    }
-    return 0
-  })
-
-  allProducts = allProducts.slice(0, req.params.count)
-  allProducts = allProducts.map(function(el) {
-    return {
-      offerData: {
-        category_list: el.offerData.category_list,
-        images: el.offerData.images.slice(0,1),
-        name: el.offerData.name,
-        price: el.offerData.price,
-        kaspi_id: el.offerData.kaspi_id
-      }
-    }
-  });
   res.json(allProducts)
 })
 /*
@@ -391,7 +338,7 @@ content-type: application/json
 
 // begin get item by kaspi id
 router.get('/kaspi_id/:id', async (req, res) => {
-  const targetProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': req.params.id }).exec()
+  const targetProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': req.params.id }).lean().exec()
   const similarProducts = []
 
   for (const product of targetProduct.similarProductsId) {
@@ -464,7 +411,7 @@ content-type: application/json
 // begin get all categories
 
 router.get('/getAllCategories', async (req, res) => {
-  const tree = await mongoCategoryTree.findOne({ trigger: 'current' }).exec()
+  const tree = await mongoCategoryTree.findOne({ trigger: 'current' }, { tree: true, _id: false }).lean().exec()
   const resultArray = new Array()
   for (const key in tree.tree) {
     const tmp = {
@@ -489,7 +436,7 @@ content-type: application/json
 router.post('/addSimilarGoods', async (req, res) => {
   const data = req.body
 
-  const targetProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': data.kaspi_id }).exec()
+  const targetProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': data.kaspi_id }).lean().exec()
   const resultSimilarProducts = []
 
   data.similarProductsId.forEach(product => {
@@ -546,7 +493,17 @@ content-type: application/json
 router.post('/filter/categories', async (req, res) => {
   const data = req.body
 
-  let allGoods = await mongoStorage.find().exec()
+  let allGoods = await mongoStorage.find({}, {
+    active: true,
+    salePrice: true,
+    sale: true,
+    'offerData.category_list': true,
+    'offerData.images': true,
+    'offerData.name': true,
+    'offerData.price': true,
+    'offerData.kaspi_id': true,
+    'offerData.kaspi_rating': true
+  }).lean().exec()
 
   for (const key in data.categories) {
     if (key === 'firstLevelCategory') {
@@ -587,7 +544,19 @@ content-type: application/json
 
 router.post('/getGoods/categories', async (req, res) => {
   const data = req.body
-  let shop = await mongoStorage.find().exec()
+
+  let shop = await mongoStorage.find({}, {
+    active: true,
+    salePrice: true,
+    sale: true,
+    'offerData.category_list': true,
+    'offerData.images': true,
+    'offerData.name': true,
+    'offerData.price': true,
+    'offerData.kaspi_id': true,
+    'offerData.kaspi_rating': true
+  }).lean().exec()
+
   for (const key in data) {
     if (key === 'firstLevelCategory') {
       shop = shop.filter(element => {
@@ -608,17 +577,6 @@ router.post('/getGoods/categories', async (req, res) => {
 
   if (data.count) {
     shop = shop.slice(0, data.count)
-    shop = shop.map(function(el) {
-      return {
-        offerData: {
-          category_list: el.offerData.category_list,
-          images: el.offerData.images.slice(0,1),
-          name: el.offerData.name,
-          price: el.offerData.price,
-          kaspi_id: el.offerData.kaspi_id
-        }
-      }
-    });
   }
 
   res.json({ products: shop })
