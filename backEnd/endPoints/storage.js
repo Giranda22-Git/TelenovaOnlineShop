@@ -833,7 +833,18 @@ wsClient.on('connection', async (client, data) => {
       const filterKeys = {}
 
       if (!data.query) {
-        allProducts = await mongoStorage.find().exec()
+        allProducts = await mongoStorage.find({}, {
+          active: true,
+          salePrice: true,
+          sale: true,
+          'offerData.category_list': true,
+          'offerData.images': true,
+          'offerData.name': true,
+          'offerData.price': true,
+          'offerData.kaspi_id': true,
+          'offerData.kaspi_rating': true,
+          'offerData.properties': true
+        }).lean().exec()
 
         for (const key in data.filters) {
           if (key === "firstLevelCategory") {
