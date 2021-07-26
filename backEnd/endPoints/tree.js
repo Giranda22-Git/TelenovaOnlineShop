@@ -2,8 +2,6 @@ const router = require('express').Router()
 const multer = require('multer')
 const fs = require('fs')
 
-const axios = require('axios')
-
 const mongoCategoryTree = require('../models/CategoryTree.js').mongoCategoryTree
 const mongoCategoryList = require('../models/CategoryList.js').mongoCategoryList
 

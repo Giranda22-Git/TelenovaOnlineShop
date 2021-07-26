@@ -5,8 +5,11 @@ const cors = require('cors')
 
 const serverData = require('./staticData/mountedData.js').data
 const mountedCreateNewCategoryTree = require('./staticData/mountedData.js').mountedCreateNewCategoryTree
-
+const mountedReactivatePromoCodeWorkers = require('./staticData/mountedData.js').restartPromoCodeWorkers
+const mountedRestartPromoActionWorkers = require('./staticData/mountedData.js').restartPromoActionWorkers
 mountedCreateNewCategoryTree()
+mountedReactivatePromoCodeWorkers()
+mountedRestartPromoActionWorkers()
 
 const app = express()
 
@@ -35,6 +38,8 @@ async function init(serverData) {
 		app.use('/storage', require('./endPoints/storage.js'))
 		app.use('/categoryTree', require('./endPoints/tree.js'))
 		app.use('/order', require('./endPoints/order.js'))
+    app.use('/promoCode', require('./endPoints/promoCode.js'))
+    app.use('/promoAction', require('./endPoints/promoAction.js'))
 	})
 	mongoose.connection.emit('open')
 }

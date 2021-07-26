@@ -1,9 +1,8 @@
 <template>
   <div id="app">
     <div class="form">
-      <input type="text" v-model="category" placeholder="category name">
       <label for="file">{{ filename }}</label>
-      <input style="display: none" id="file" type="file" name="files" @change="handleFileUpload()" ref="file">
+      <input style="display: none" id="file" type="file" name="files" @change="handleFileUpload()" ref="file" multiple="true">
       <button @click="sendFile">Send</button>
     </div>
     {{ resData }}
@@ -16,25 +15,36 @@ export default {
   name: 'App',
   data: () => ({
     filename: 'Выберите файл',
-    image: null,
-    category: '',
+    images: [],
+    productKaspiId: '100098508', // Фото- и видеокамеры
+    categoryName: 'Фото- и видеокамеры',
+    typeOfPromo: 1,
+    bigPromoText: 'asdadascdssd',
+    timeOfPromoEnding: '2021-07-26T10:27:24.626Z',
+    sale: 20,
     resData: null
   }),
   methods: {
     handleFileUpload () {
-      if (this.$refs.file.files.length === 0) this.image = null
+      if (this.$refs.file.files.length === 0) this.images = []
       else {
-        this.image = this.$refs.file.files[0]
-        this.filename = this.image.name
+        this.images = this.$refs.file.files
+        this.filename = this.images[0].name
       }
     },
     async sendFile () {
-      if (this.image) {
+      if (this.images) {
         const formData = new FormData()
-        formData.append('file', this.image)
-        formData.append('category', this.category)
-        console.log(this.image)
-        await axios.post('http://localhost:3001/categoryTree/addImage',
+        this.images.forEach(file => {
+          formData.append('files', file)
+        })
+        formData.append('productKaspiId', this.productKaspiId)
+        formData.append('typeOfPromo', this.typeOfPromo)
+        formData.append('bigPromoText', this.bigPromoText)
+        formData.append('timeOfPromoEnding', this.timeOfPromoEnding)
+        formData.append('sale', this.sale)
+        console.log(this.images)
+        await axios.post('http://localhost:3001/promoAction/',
           formData
         )
           .then(response => {
@@ -46,7 +56,7 @@ export default {
           .catch(err => {
             console.log(err)
           })
-        this.image = null
+        this.images = []
         this.filename = 'Выберите файл'
       }
     }

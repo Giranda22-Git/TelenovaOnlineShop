@@ -7,6 +7,7 @@ const wsClients = new Set()
 const mongoStorage = require('../models/Storage.js').mongoStorage
 const mongoCategoryTree = require('../models/CategoryTree.js').mongoCategoryTree
 const mongoCategoryList = require('../models/CategoryList.js').mongoCategoryList
+const mongoPromoCode = require('../models/PromoCode.js').mongoPromoCode
 
 const nearNumber = (arr, number) =>
   arr.map(it => {
@@ -629,6 +630,21 @@ wsClient.on('connection', async (client, data) => {
 
     console.log(msg)
 
+
+    // begin check promoCode
+    if (msg.action === 'checkPromoCode') {
+      const data = msg.data
+
+      const promoCode = await mongoPromoCode.findOne({ code: data.promoCode }, {sale: true, code: true}).lean().exec()
+
+      if (promoCode) {
+        client.send(JSON.stringify({ok: true, data: promoCode}))
+      } else {
+        client.send(JSON.stringify({ ok: false, data: 'промокод истек либо был написан не правильно' }))
+      }
+    }
+
+
     // begin ws search
     if (msg.action === 'search') {
       const data = msg.data
@@ -897,17 +913,7 @@ wsClient.on('connection', async (client, data) => {
         }
         return 0
       })
-      shop = shop.map(function(el) {
-        return {
-          offerData: {
-            category_list: el.offerData.category_list,
-            images: el.offerData.images.slice(0,1),
-            name: el.offerData.name,
-            price: el.offerData.price,
-            kaspi_id: el.offerData.kaspi_id
-          }
-        }
-      });
+
       const finishAnswer = {
         priceRange: [allProducts[0].offerData.price, allProducts[allProducts.length - 1].offerData.price],
         filterKeys,

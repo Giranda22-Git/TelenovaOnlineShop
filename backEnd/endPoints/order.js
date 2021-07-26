@@ -3,6 +3,7 @@ const router = require('express').Router()
 const mongoOrders = require('../models/Orders.js').mongoOrders
 const mongoStorage = require('../models/Storage.js').mongoStorage
 const mongoCategoryList = require('../models/CategoryList.js').mongoCategoryList
+const mongoPromoCode = require('../models/PromoCode.js').mongoPromoCode
 
 
 // begin get all orders
@@ -21,6 +22,14 @@ router.post('/', async (req, res) => {
   const data = req.body
 
   const goods = []
+  let sale = 0
+
+  if (data.promoCode) {
+    const tmpPromoCode = await mongoPromoCode.findOne({ code: data.promoCode }).lean().exec()
+    if (tmpPromoCode) {
+      sale = tmpPromoCode.sale
+    }
+  }
 
   for (const product of data.goods) {
     const targetProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': product.kaspi_id }).exec()
@@ -59,10 +68,10 @@ router.post('/', async (req, res) => {
     name: data.name,
     paymentMethod: data.paymentMethod,
     cardNumber: data.cardNumber,
-    finishPrice: finishPrice
+    finishPrice: finishPrice - (finishPrice * (sale / 100))
   })
-  const result = await newOrder.save()
 
+  const result = await newOrder.save()
   res.json(result)
 })
 /*
@@ -70,6 +79,7 @@ POST http://localhost:3001/order/ HTTP/1.1
 content-type: application/json
 
 {
+  "promoCode": "CAifV3dU2Z5dSLh",
   "address": "abay 150/230",
   "phoneNumber": "+7(705)553-99-66",
   "email": "asqw0@bk.ru",
