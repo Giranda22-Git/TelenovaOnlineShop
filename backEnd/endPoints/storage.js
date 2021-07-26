@@ -114,7 +114,16 @@ function array_compare(a, b) {
 
 router.get('/', async (req, res) => {
   const start = new Date().getTime()
-  const result = await mongoStorage.find().lean().exec()
+  const result = await mongoStorage.find({}, {
+    active: true,
+    salePrice: true,
+    sale: true,
+    'offerData.category_list': true,
+    'offerData.images': true,
+    'offerData.name': true,
+    'offerData.price': true,
+    'offerData.kaspi_id': true
+  }).lean().exec()
   const end = new Date().getTime()
   res.status(200).json(result)
   console.log(`SecondWay: ${end - start}ms`)
