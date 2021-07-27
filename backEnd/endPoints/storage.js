@@ -265,6 +265,13 @@ router.get('/mostPopular/firstLevelCategories/:count', async (req, res) => {
   const categoryList = await mongoCategoryList.find({ level: 1 }, { __v: false })
   .sort({ 'countOfSold': -1 }).limit(Number(req.params.count)).lean().exec()
 
+  for (const category of categoryList) {
+    const isExistProduct = await mongoStorage.countDocuments({ 'offerData.category_list': { $in: [category.name] } }).exec()
+    if (isExistProduct > 0) {
+      result.push(category)
+    }
+  }
+
   res.json(categoryList)
 })
 /*
@@ -279,10 +286,20 @@ content-type: application/json
 // begin get most popular second level categories
 
 router.get('/mostPopular/secondLevelCategories/:count', async (req, res) => {
+  const start = new Date().getTime()
   let categoryList = await mongoCategoryList.find({ level: 2 }, { __v: false })
   .sort({ 'countOfSold': -1 }).limit(Number(req.params.count)).lean().exec()
 
+  for (const category of categoryList) {
+    const isExistProduct = await mongoStorage.countDocuments({ 'offerData.category_list': { $in: [category.name] } }).exec()
+    if (isExistProduct > 0) {
+      result.push(category)
+    }
+  }
+
   res.json(categoryList)
+  const end = new Date().getTime()
+  console.log(`SecondWay second: ${end - start}ms`)
 })
 /*
 TEST:
@@ -296,10 +313,18 @@ content-type: application/json
 // begin get most popular third level categories
 
 router.get('/mostPopular/thirdLevelCategories/:count', async (req, res) => {
-  let categoryList = await mongoCategoryList.find({ level: 3 }, { __v: false })
+  const categoryList = await mongoCategoryList.find({ level: 3 }, { __v: false })
   .sort({ 'countOfSold': -1 }).limit(Number(req.params.count)).lean().exec()
+  const result = []
 
-  res.json(categoryList)
+  for (const category of categoryList) {
+    const isExistProduct = await mongoStorage.countDocuments({ 'offerData.category_list': { $in: [category.name] } }).exec()
+    if (isExistProduct > 0) {
+      result.push(category)
+    }
+  }
+
+  res.json(result)
 })
 /*
 TEST:
