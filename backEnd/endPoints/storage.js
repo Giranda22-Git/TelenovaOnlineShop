@@ -273,7 +273,7 @@ router.get('/mostPopular/firstLevelCategories/:count', async (req, res) => {
     }
   }
 
-  res.json(categoryList)
+  res.json(result)
 })
 /*
 TEST:
@@ -299,7 +299,7 @@ router.get('/mostPopular/secondLevelCategories/:count', async (req, res) => {
     }
   }
 
-  res.json(categoryList)
+  res.json(result)
   const end = new Date().getTime()
   console.log(`SecondWay second: ${end - start}ms`)
 })
