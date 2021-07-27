@@ -263,13 +263,16 @@ content-type: application/json
 
 router.get('/mostPopular/firstLevelCategories/:count', async (req, res) => {
   const categoryList = await mongoCategoryList.find({ level: 1 }, { __v: false })
-  .sort({ 'countOfSold': -1 }).limit(Number(req.params.count)).lean().exec()
+  .sort({ 'countOfSold': -1 }).lean().exec()
   const result = []
 
   for (const category of categoryList) {
     const isExistProduct = await mongoStorage.countDocuments({ 'offerData.category_list': { $in: [category.name] } }).exec()
     if (isExistProduct > 0) {
       result.push(category)
+    }
+    if (result.length >= req.params.count) {
+      break
     }
   }
 
@@ -289,13 +292,16 @@ content-type: application/json
 router.get('/mostPopular/secondLevelCategories/:count', async (req, res) => {
   const start = new Date().getTime()
   let categoryList = await mongoCategoryList.find({ level: 2 }, { __v: false })
-  .sort({ 'countOfSold': -1 }).limit(Number(req.params.count)).lean().exec()
+  .sort({ 'countOfSold': -1 }).lean().exec()
   const result = []
 
   for (const category of categoryList) {
     const isExistProduct = await mongoStorage.countDocuments({ 'offerData.category_list': { $in: [category.name] } }).exec()
     if (isExistProduct > 0) {
       result.push(category)
+    }
+    if (result.length >= req.params.count) {
+      break
     }
   }
 
@@ -316,13 +322,16 @@ content-type: application/json
 
 router.get('/mostPopular/thirdLevelCategories/:count', async (req, res) => {
   const categoryList = await mongoCategoryList.find({ level: 3 }, { __v: false })
-  .sort({ 'countOfSold': -1 }).limit(Number(req.params.count)).lean().exec()
+  .sort({ 'countOfSold': -1 }).lean().exec()
   const result = []
 
   for (const category of categoryList) {
     const isExistProduct = await mongoStorage.countDocuments({ 'offerData.category_list': { $in: [category.name] } }).exec()
     if (isExistProduct > 0) {
       result.push(category)
+    }
+    if (result.length >= req.params.count) {
+      break
     }
   }
 
@@ -636,9 +645,9 @@ wsClient.on('connection', async (client, data) => {
       const promoCode = await mongoPromoCode.findOne({ code: data.promoCode }, {sale: true, code: true}).lean().exec()
 
       if (promoCode) {
-        client.send(JSON.stringify({ok: true, data: promoCode}))
+        client.send(JSON.stringify({ action: 'checkPromoCode', data: {ok: true, promoCode} }))
       } else {
-        client.send(JSON.stringify({ ok: false, data: 'промокод истек либо был написан не правильно' }))
+        client.send(JSON.stringify({ action: 'checkPromoCode', data: {ok: false, errMSG: 'промокод истек либо был написан не правильно'} }))
       }
     }
 
