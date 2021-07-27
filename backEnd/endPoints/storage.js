@@ -264,6 +264,7 @@ content-type: application/json
 router.get('/mostPopular/firstLevelCategories/:count', async (req, res) => {
   const categoryList = await mongoCategoryList.find({ level: 1 }, { __v: false })
   .sort({ 'countOfSold': -1 }).limit(Number(req.params.count)).lean().exec()
+  const result = []
 
   for (const category of categoryList) {
     const isExistProduct = await mongoStorage.countDocuments({ 'offerData.category_list': { $in: [category.name] } }).exec()
@@ -289,6 +290,7 @@ router.get('/mostPopular/secondLevelCategories/:count', async (req, res) => {
   const start = new Date().getTime()
   let categoryList = await mongoCategoryList.find({ level: 2 }, { __v: false })
   .sort({ 'countOfSold': -1 }).limit(Number(req.params.count)).lean().exec()
+  const result = []
 
   for (const category of categoryList) {
     const isExistProduct = await mongoStorage.countDocuments({ 'offerData.category_list': { $in: [category.name] } }).exec()
