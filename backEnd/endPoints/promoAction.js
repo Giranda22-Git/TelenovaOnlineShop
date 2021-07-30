@@ -12,7 +12,7 @@ const mongoCategoryList = require('../models/CategoryList.js').mongoCategoryList
 const promoActionMiddleware = require('../staticData/supFunctions.js').promoActionMiddleware
 
 const tmpDir = __dirname + '/promoActionsImages/'
-const upload = multer({ dest: __dirname + '/promoActionsImages/' })
+const upload = multer({ dest: __dirname + '/promoActionsImages/', limits: { fileSize: 15000000 } })
 
 
 // begin get all promoActions
@@ -199,7 +199,7 @@ function filesValidation (files, name) {
   let index = 0
   files.forEach(file => {
 
-    const validTypes = ['svg+xml', 'png', 'gif', 'jpeg']
+    const validTypes = ['svg+xml', 'png', 'gif', 'jpeg', 'jpg']
 
     const fileType = file.mimetype.split('/')
 

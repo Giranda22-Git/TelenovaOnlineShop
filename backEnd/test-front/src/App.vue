@@ -20,7 +20,7 @@ export default {
     categoryName: 'Телевизоры',
     typeOfPromo: 1,
     bigPromoText: 'asdadascdssd',
-    timeOfPromoEnding: '2021-07-30T10:42:29.396Z',
+    timeOfPromoEnding: '2021-07-30T11:48:49.104Z',
     sale: 20,
     resData: null
   }),
