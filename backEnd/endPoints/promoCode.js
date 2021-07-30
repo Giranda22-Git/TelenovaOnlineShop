@@ -63,7 +63,7 @@ content-type: application/json
 
 router.delete('/', async (req, res) => {
   const data = req.body
-
+  console.log(data)
   const result = await mongoPromoCode.deleteOne({ _id: data.id }).exec()
   res.json(result)
 })
