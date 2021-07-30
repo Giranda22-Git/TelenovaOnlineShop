@@ -205,6 +205,7 @@ function filesValidation (files, name) {
 
     if (file.size > 10000000 || fileType[0] !== 'image' || !validTypes.includes(fileType[1])) {
       delBadFile(file.filename)
+      console.log('bad file')
       return false
     }
     else {
