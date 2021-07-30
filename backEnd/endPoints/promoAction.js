@@ -42,6 +42,7 @@ router.get('/download/:filename', (req, res) => {
 router.post('/', upload.array('files', 15), async (req, res) => {
   const data = req.body
   const files = req.files
+  console.log(files)
   let filesDeletedFlag = false
 
   let result = null
