@@ -130,12 +130,11 @@ router.post('/orderStatus', async (req, res) => {
 router.post('/paybox', async (req, res) => {
   const data = req.body
   data.MyDataObj = JSON.parse(data.MyDataObj)
-  console.log(data)
-  console.log(data.MyDataObj)
-  console.log(data.MyDataObj.id)
+  data.pg_result = Boolean(Number(data.pg_result))
 
-  await mongoOrders.updateOne({ _id: data.MyDataObj.id }, { paymentStatus: 'paid', payBoxData: data }).lean().exec()
-
+  if (data.pg_result) {
+    await mongoOrders.updateOne({ _id: data.MyDataObj.id }, { paymentStatus: 'paid', payBoxData: data }).lean().exec()
+  }
   res.sendStatus(200)
 })
 
