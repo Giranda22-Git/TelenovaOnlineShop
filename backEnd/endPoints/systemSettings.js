@@ -29,7 +29,7 @@ router.post('/', async (req, res) => {
   res.json(result)
 })
 /*
-POST http://localhost:3001/systemSetting/ HTTP/1.1
+POST https://textforeva.ru/systemSetting/ HTTP/1.1
 content-type: application/json
 
 {

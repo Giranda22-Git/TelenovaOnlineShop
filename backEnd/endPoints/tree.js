@@ -11,13 +11,12 @@ const tmpDir = __dirname + '/categoryImages/'
 const upload = multer({ dest: __dirname +  '/categoryImages/' })
 
 
-// begin get file by filename
 router.get('/', async (req, res) => {
   const result = await mongoCategoryList.find().exec()
   res.status(200).send(JSON.stringify(result))
 })
 
-
+// begin get file by filename
 router.get('/download/:filename', async (req, res) => {
   const product = await mongoCategoryList.findOne({ name: req.params.filename }).exec()
   if (product.image.fileName) {
@@ -86,7 +85,7 @@ router.post('/addImage', upload.single('file'), async (req, res) => {
         })
       }
       if (validTypes.includes(fileType[1])) {
-        const newFileName = targetCategory.name + `.${fileType[1]}`
+        const newFileName = targetCategory.name
         fs.renameSync(tmpDir + file.filename, tmpDir + newFileName)
 
         image = {

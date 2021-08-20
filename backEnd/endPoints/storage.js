@@ -444,6 +444,16 @@ content-type: application/json
 // begin update active status
 
 
+// begin get all goods by on_kaspi
+
+router.get('/on_kaspi', async (req, res) => {
+  const result = await mongoStorage.find({ 'offerData.on_kaspi': { $ne: false } }, { 'offerData.kaspi_id': true }).lean().exec()
+  res.json(result)
+})
+
+// end get all goods by on_kaspi
+
+
 // begin get all categories
 
 router.get('/getAllCategories', async (req, res) => {
@@ -563,12 +573,12 @@ router.post('/filter/categories', async (req, res) => {
 })//ТВ, Аудио, Видео
 
 /*
-POST http://localhost:3001/storage/filter/categories HTTP/1.1
+POST https://textforeva.ru/storage/filter/categories HTTP/1.1
 content-type: application/json
 
 {
   "categories": {
-    "thirdLevelCategory": "Объективы 6"
+    "firstLevelCategory": "Мобильные телефоны и аксессуары"
   }
 }
 */
