@@ -134,7 +134,7 @@ router.post('/paybox', async (req, res) => {
   console.log(data.MyDataObj)
   console.log(data.MyDataObj.id)
 
-  await mongoOrders.updateOne({ _id: data.MyDataObj.id }, { orderStatus: 'paid', payBoxData: data }).lean().exec()
+  await mongoOrders.updateOne({ _id: data.MyDataObj.id }, { paymentStatus: 'paid', payBoxData: data }).lean().exec()
 
   res.sendStatus(200)
 })
