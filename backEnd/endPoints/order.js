@@ -129,7 +129,7 @@ router.post('/orderStatus', async (req, res) => {
 
 router.post('/paybox', async (req, res) => {
   const data = req.body
-
+  data.MyDataObj = JSON.parse(data.MyDataObj)
   console.log(data)
   console.log(data.MyDataObj)
   console.log(data.MyDataObj.id)
