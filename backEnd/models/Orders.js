@@ -47,6 +47,10 @@ const order = new mongoose.Schema({
   finishPrice: {
     type: Number,
     default: 0
+  },
+  payBoxData: {
+    type: Object,
+    default: {}
   }
 })
 

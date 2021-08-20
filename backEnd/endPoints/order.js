@@ -125,6 +125,21 @@ router.post('/orderStatus', async (req, res) => {
 // end switch orderStatus
 
 
+// begin paybox webhook
+
+router.post('/paybox', async (req, res) => {
+  const data = req.body
+
+  console.log(data)
+
+  await mongoOrders.updateOne({ _id: data.id }, { orderStatus: 'paid', payBoxData: data }).lean().exec()
+
+  res.sendStatus(200)
+})
+
+// end paybox webhook
+
+
 // begin delete all orders
 router.delete('/deleteAllOrders', async (req, res) => {
   const result = await mongoOrders.deleteMany({}).exec()
