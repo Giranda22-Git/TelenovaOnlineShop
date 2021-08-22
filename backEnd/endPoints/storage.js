@@ -880,7 +880,7 @@ wsClient.on('connection', async (client, data) => {
         })
 
         const finishAnswerArray = new Array()
-
+        console.log(resultArray)
         resultArray.forEach(element => {
           console.log(element.tmpProduct.offerData.name, symbolsRangeAverage)
           if (Object.keys(element).includes('tmpProduct')) {
