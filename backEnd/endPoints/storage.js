@@ -803,9 +803,13 @@ wsClient.on('connection', async (client, data) => {
           let coincidence = 0
           // productName.includes(data.query.toLowerCase())
 
-          if (false) {
-            fullSameProducts.push(product)
-            console.log('unshift', productName)
+          if (productName.includes(data.query.toLowerCase())) {
+            const resProduct = {
+              symbolsRangeAverage: 0,
+              tmpProduct: product
+            }
+
+            resultArray.push(resProduct)
           } else {
             let cutedQuery = ''
 
