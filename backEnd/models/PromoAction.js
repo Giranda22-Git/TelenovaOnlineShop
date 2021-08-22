@@ -9,7 +9,15 @@ const promoAction = new mongoose.Schema({
     type: String,
     default: ''
   },
+  productKaspiIdData: {
+    type: Object,
+    default: {}
+  },
   categoryName: {
+    type: String,
+    default: ''
+  },
+  name: {
     type: String,
     default: ''
   },

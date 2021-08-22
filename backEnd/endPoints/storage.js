@@ -112,9 +112,12 @@ function array_compare(a, b) {
   return true
 }
 
+
+// begin get all goods Warning!!!: this is the heavy load end point
+
 router.get('/', async (req, res) => {
   const start = new Date().getTime()
-  const result = await mongoStorage.find({}, {
+  const result = await mongoStorage.find({ active: true }, {
     active: true,
     salePrice: true,
     sale: true,
@@ -129,6 +132,29 @@ router.get('/', async (req, res) => {
   res.status(200).json(result)
   console.log(`SecondWay: ${end - start}ms`)
 })
+
+// end get all goods Warning!!!: this is the heavy load end point
+
+
+
+// begin get goods by active status
+
+router.get('/active/:status', async (req, res) => {
+  const result = await mongoStorage.find({ active: req.params.status }, {
+    active: true,
+    salePrice: true,
+    sale: true,
+    'offerData.category_list': true,
+    'offerData.images': true,
+    'offerData.name': true,
+    'offerData.price': true,
+    'offerData.kaspi_id': true,
+    'offerData.kaspi_rating': true
+  }).lean().exec()
+  res.json(result)
+})
+
+// end get goods by active status
 
 // begin add new goods
 router.post('/addGoods', async (req, res) => {
@@ -236,7 +262,7 @@ content-type: application/json
 // begin get most popular prodcuts
 
 router.get('/mostPopular/products/:count', async (req, res) => {
-  const allProducts = await mongoStorage.find({}, {
+  const allProducts = await mongoStorage.find({ active: true }, {
     active: true,
     salePrice: true,
     sale: true,
@@ -346,10 +372,10 @@ content-type: application/json
 // end get most popular third level categories
 
 
-// begin get new prodcuts
+// begin get new products
 
 router.get('/mostPopular/freshProducts/:count', async (req, res) => {
-  let allProducts = await mongoStorage.find({}, {
+  let allProducts = await mongoStorage.find({ active: true }, {
     active: true,
     salePrice: true,
     sale: true,
@@ -369,7 +395,7 @@ TEST:
 GET http://localhost:3001/storage/mostPopular/freshProducts/4 HTTP/1.1
 content-type: application/json
 */
-// end get new prodcuts
+// end get new products
 
 
 // begin get item by kaspi id
@@ -378,7 +404,7 @@ router.get('/kaspi_id/:id', async (req, res) => {
   const similarProducts = []
 
   for (const product of targetProduct.similarProductsId) {
-    const tmp = await mongoStorage.findOne({ 'offerData.kaspi_id': product }).exec()
+    const tmp = await mongoStorage.findOne({ 'offerData.kaspi_id': product, active: true }).exec()
     similarProducts.push(tmp)
   }
   targetProduct.similarProducts = similarProducts
@@ -539,7 +565,7 @@ content-type: application/json
 router.post('/filter/categories', async (req, res) => {
   const data = req.body
 
-  let allGoods = await mongoStorage.find({}, {
+  let allGoods = await mongoStorage.find({ active: true }, {
     active: true,
     salePrice: true,
     sale: true,
@@ -591,7 +617,7 @@ content-type: application/json
 router.post('/getGoods/categories', async (req, res) => {
   const data = req.body
 
-  let shop = await mongoStorage.find({}, {
+  let shop = await mongoStorage.find({ active: true }, {
     active: true,
     salePrice: true,
     sale: true,
@@ -666,7 +692,7 @@ wsClient.on('connection', async (client, data) => {
     if (msg.action === 'search') {
       const data = msg.data
 
-      let shop = await mongoStorage.find({}, {
+      let shop = await mongoStorage.find({ active: true }, {
         active: true,
         salePrice: true,
         sale: true,
@@ -856,6 +882,7 @@ wsClient.on('connection', async (client, data) => {
         const finishAnswerArray = new Array()
 
         resultArray.forEach(element => {
+          console.log(element.offerData.name, symbolsRangeAverage)
           if (Object.keys(element).includes('tmpProduct')) {
             finishAnswerArray.push(element.tmpProduct)
           } else {
@@ -879,7 +906,7 @@ wsClient.on('connection', async (client, data) => {
       const filterKeys = {}
 
       if (!data.query) {
-        allProducts = await mongoStorage.find({}, {
+        allProducts = await mongoStorage.find({ active: true }, {
           active: true,
           salePrice: true,
           sale: true,

@@ -27,7 +27,7 @@ async function restartPromoCodeWorkers () {
   for (const promoCode of promoCodes) {
     const tmpDate = new Date(promoCode.date)
     if (tmpDate > new Date()) {
-      worker.scheduleJob(tmpDate, async (y) => {
+      worker.scheduleJob(String(promoCode._id), tmpDate, async (y) => {
         console.log(y)
         const tmp = await mongoPromoCode.deleteOne({ _id: promoCode._id }).exec()
         console.log(tmp)
@@ -62,7 +62,7 @@ async function restartPromoActionWorkers () {
   for (const promoAction of promoActions) {
     if (promoAction.productKaspiId.length > 1) {
       if (new Date(promoAction.timeOfPromoEnding) > new Date()) {
-        worker.scheduleJob(new Date(promoAction.timeOfPromoEnding), async (y) => {
+        worker.scheduleJob(String(promoAction._id), new Date(promoAction.timeOfPromoEnding), async (y) => {
           console.log(y)
 
           await promoActionMiddleware(promoAction._id, -1, false)
@@ -80,7 +80,7 @@ async function restartPromoActionWorkers () {
     }
     else if (promoAction.categoryName.length > 1) {
       if (new Date(promoAction.timeOfPromoEnding) > new Date()) {
-        worker.scheduleJob(new Date(promoAction.timeOfPromoEnding), async (y) => {
+        worker.scheduleJob(String(promoAction._id), new Date(promoAction.timeOfPromoEnding), async (y) => {
           console.log(y)
           await promoActionMiddleware(promoAction._id, -1, true)
 

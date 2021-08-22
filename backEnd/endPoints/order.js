@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const axios = require('axios')
 
 const mongoOrders = require('../models/Orders.js').mongoOrders
 const mongoStorage = require('../models/Storage.js').mongoStorage
@@ -68,8 +69,25 @@ router.post('/', async (req, res) => {
     name: data.name,
     paymentMethod: data.paymentMethod,
     cardNumber: data.cardNumber,
-    finishPrice: finishPrice - (finishPrice * (sale / 100))
+    finishPrice: finishPrice - (finishPrice * (sale / 100)),
+    credit: data.credit ? data.credit : false,
+    iin: data.iin ? data.iin : '',
+    bank: data.bank ? data.bank : '',
+    creditMonth: data.creditMonth ? data.creditMonth : 0
   })
+
+  // let Query = `https://telenova.bitrix24.kz/rest/51/atlvkfldeh2wezg0/crm.lead.add.json?FIELDS[NAME]=${data.name}&FIELDS[PHONE][0][VALUE]=${data.phoneNumber}&FIELDS[PHONE][0][VALUE_TYPE]=WORK&FIELDS[ADDRESS]=${data.address}&FIELDS[PRODUCTS]=[`
+
+  // Query = encodeURI(Query)
+  // console.log(Query)
+
+  // await axios.get(Query)
+  //   .then(response => {
+  //     console.log(response.data)
+  //   })
+  //   .catch(err => {
+  //     console.log(err)
+  //   })
 
   const result = await newOrder.save()
   res.json(result)
@@ -79,7 +97,6 @@ POST http://localhost:3001/order/ HTTP/1.1
 content-type: application/json
 
 {
-  "promoCode": "CAifV3dU2Z5dSLh",
   "address": "abay 150/230",
   "phoneNumber": "+7(705)553-99-66",
   "email": "asqw0@bk.ru",

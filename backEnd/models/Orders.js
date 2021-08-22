@@ -51,6 +51,22 @@ const order = new mongoose.Schema({
   payBoxData: {
     type: Object,
     default: {}
+  },
+  credit: {
+    type: Boolean,
+    default: false
+  },
+  creditMonth: {
+    type: Number,
+    default: 0
+  },
+  iin: {
+    type: String,
+    default: ''
+  },
+  bank: {
+    type: String,
+    default: ''
   }
 })
 

@@ -17,10 +17,10 @@ export default {
     filename: 'Выберите файл',
     images: [],
     productKaspiId: '100098508', // Фото- и видеокамеры
-    categoryName: 'Телевизоры',
+    categoryName: 'Фото- и видеокамеры',
     typeOfPromo: 1,
     bigPromoText: 'asdadascdssd',
-    timeOfPromoEnding: '2021-07-30T11:48:49.104Z',
+    timeOfPromoEnding: '2021-08-21T23:07:04.895Z',
     sale: 20,
     resData: null
   }),
@@ -38,13 +38,13 @@ export default {
         this.images.forEach(file => {
           formData.append('files', file)
         })
-        formData.append('categoryName', this.categoryName)
+        formData.append('productKaspiId', this.productKaspiId)
         formData.append('typeOfPromo', this.typeOfPromo)
         formData.append('bigPromoText', this.bigPromoText)
         formData.append('timeOfPromoEnding', this.timeOfPromoEnding)
         formData.append('sale', this.sale)
         console.log(this.images)
-        await axios.post('https://textforeva.ru/promoAction/',
+        await axios.post('http://localhost:3001/promoAction/',
           formData
         )
           .then(response => {

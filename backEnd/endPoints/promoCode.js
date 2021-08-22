@@ -37,7 +37,7 @@ router.post('/', async (req, res) => {
     const result = await newPromoCode.save()
 
     if (result._id) {
-      worker.scheduleJob(date, async (y) => {
+      worker.scheduleJob(String(result._id), date, async (y) => {
         console.log(y)
         const tmp = await mongoPromoCode.deleteOne({ _id: result._id }).exec()
         console.log(tmp)
@@ -52,7 +52,7 @@ POST http://localhost:3001/promoCode/ HTTP/1.1
 content-type: application/json
 
 {
-  "date": "2021-07-24T09:23:34.240Z",
+  "date": "2021-08-21T22:59:40.820Z",
   "sale": 20
 }
 */
@@ -63,10 +63,24 @@ content-type: application/json
 
 router.delete('/', async (req, res) => {
   const data = req.body
-  console.log(data)
+
   const result = await mongoPromoCode.deleteOne({ _id: data.id }).exec()
+  const targetJob = worker.scheduledJobs[String(data.id)]
+
+  if (targetJob) {
+    targetJob.cancel()
+  }
+
   res.json(result)
 })
+/*
+DELETE http://localhost:3001/promoCode/ HTTP/1.1
+content-type: application/json
+
+{
+  "id": "612184f0f05c6d86855455f9"
+}
+*/
 
 // end delete promoCode
 

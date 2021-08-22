@@ -54,9 +54,12 @@ router.post('/', upload.any(), async (req, res) => {
       console.log(Boolean(targetProduct), Boolean(files), Boolean(!isUniquePromoAction))
       if (targetProduct && files && !isUniquePromoAction) {
         const promoImages = filesValidation(files, targetProduct.offerData.kaspi_name)
+
         result = mongoPromoAction({
           typeOfPromo: data.typeOfPromo,
           productKaspiId: data.productKaspiId,
+          productKaspiIdData: targetProduct,
+          name: data.name ? data.name : '',
           bigPromoText: data.bigPromoText ? data.bigPromoText : '',
           smallPromoText: data.smallPromoText ? data.smallPromoText : '',
           timeOfPromoEnding: new Date(data.timeOfPromoEnding),
@@ -87,6 +90,7 @@ router.post('/', upload.any(), async (req, res) => {
         result = mongoPromoAction({
           typeOfPromo: data.typeOfPromo,
           categoryName: data.categoryName,
+          name: data.name ? data.name : '',
           bigPromoText: data.bigPromoText ? data.bigPromoText : '',
           smallPromoText: data.smallPromoText ? data.smallPromoText : '',
           timeOfPromoEnding: new Date(data.timeOfPromoEnding),
@@ -118,7 +122,7 @@ router.post('/', upload.any(), async (req, res) => {
 
       await promoActionMiddleware(answer._id, 1, false)
 
-      worker.scheduleJob(new Date(data.timeOfPromoEnding), async (y) => {
+      worker.scheduleJob(String(answer._id), new Date(data.timeOfPromoEnding), async (y) => {
         console.log(y)
 
         await promoActionMiddleware(answer._id, -1, false)
@@ -136,7 +140,7 @@ router.post('/', upload.any(), async (req, res) => {
 
       await promoActionMiddleware(answer._id, 1, true)
 
-      worker.scheduleJob(new Date(data.timeOfPromoEnding), async (y) => {
+      worker.scheduleJob(String(answer._id), new Date(data.timeOfPromoEnding), async (y) => {
         console.log(y)
         await promoActionMiddleware(answer._id, -1, true)
 
@@ -156,7 +160,7 @@ content-type: application/json
   "sale": 20,
   "categoryName": "Фото- и видеокамеры",
   "bigPromoText": "sdaasdalkdmaks",
-  "timeOfPromoEnding": "2021-07-26T07:44:48.571Z"
+  "timeOfPromoEnding": "2021-08-21T22:01:20.021Z"
 }
 */
 // end create new promoAction
@@ -188,6 +192,54 @@ router.get('/typeOfPromo/:typeOfPromo', async (req, res) => {
 })
 
 // end get promoActions by typeOfPromo
+
+
+// begin delete promoAction by id
+
+router.delete('/', async (req, res) => {
+  const data = req.body
+
+  const targetPromoAction = await mongoPromoAction.findById(data.id).lean().exec()
+
+  if (targetPromoAction) {
+    if (targetPromoAction.productKaspiId) {
+      const targetJob = worker.scheduledJobs[String(targetPromoAction._id)]
+
+      if (targetJob) {
+        targetJob.cancel()
+      }
+
+      await promoActionMiddleware(targetPromoAction._id, -1, false)
+
+      deletePromoAction(targetPromoAction._id)
+    }
+    else if (targetPromoAction.categoryName) {
+      const targetJob = worker.scheduledJobs[String(targetPromoAction._id)]
+
+      if (targetJob) {
+        targetJob.cancel()
+      }
+
+      await promoActionMiddleware(targetPromoAction._id, -1, true)
+
+      deletePromoAction(targetPromoAction._id)
+    }
+
+    res.sendStatus(200)
+  } else {
+    res.sendStatus(500)
+  }
+})
+/*
+DELETE http://localhost:3001/promoAction/ HTTP/1.1
+content-type: application/json
+
+{
+  "id": "612183e57ac5db85d51d0bf8"
+}
+*/
+
+// end delete promoAction by id
 
 
 function delBadFile(fileName) {
