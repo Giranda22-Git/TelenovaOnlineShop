@@ -401,14 +401,18 @@ content-type: application/json
 // begin get item by kaspi id
 router.get('/kaspi_id/:id', async (req, res) => {
   const targetProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': req.params.id }).lean().exec()
-  const similarProducts = []
+  if (targetProduct) {
+    const similarProducts = []
 
-  for (const product of targetProduct.similarProductsId) {
-    const tmp = await mongoStorage.findOne({ 'offerData.kaspi_id': product, active: true }).exec()
-    similarProducts.push(tmp)
+    for (const product of targetProduct.similarProductsId) {
+      const tmp = await mongoStorage.findOne({ 'offerData.kaspi_id': product, active: true }).exec()
+      similarProducts.push(tmp)
+    }
+    targetProduct.similarProducts = similarProducts
+    res.json(targetProduct)
+  } else {
+    res.sendStatus(404)
   }
-  targetProduct.similarProducts = similarProducts
-  res.json(targetProduct)
 })
 // end get item by kaspi id
 
