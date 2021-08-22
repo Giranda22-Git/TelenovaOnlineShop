@@ -797,7 +797,6 @@ wsClient.on('connection', async (client, data) => {
       if (data.query) {
         const queryArray = data.query.toLowerCase().split('')
         const resultArray = new Array()
-        const fullSameProducts = new Array()
         shop.forEach((product) => {
           let productName = product.offerData.name.toLowerCase()
           let coincidence = 0
@@ -893,12 +892,6 @@ wsClient.on('connection', async (client, data) => {
             finishAnswerArray.push(element)
           }
         })
-
-        if (fullSameProducts.length !== 0) {
-          fullSameProducts.forEach(element => {
-            finishAnswerArray.unshift(element)
-          })
-        }
 
         shop = finishAnswerArray
       }
