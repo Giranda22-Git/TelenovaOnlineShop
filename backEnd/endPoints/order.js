@@ -25,10 +25,12 @@ router.post('/', async (req, res) => {
   const goods = []
   let sale = 0
 
+  console.log(data.promoCode)
   if (data.promoCode) {
     const tmpPromoCode = await mongoPromoCode.findOne({ code: data.promoCode }).lean().exec()
     if (tmpPromoCode) {
       sale = tmpPromoCode.sale
+      console.log('promoCode: ', sale)
     }
   }
 
