@@ -46,8 +46,9 @@ router.post('/', upload.any(), async (req, res) => {
   let filesDeletedFlag = false
 
   let result = null
-
+  console.log('bad time')
   if (new Date(data.timeOfPromoEnding) > new Date()) {
+    console.log('true time')
     if (data.productKaspiId) {
       const targetProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': data.productKaspiId }).lean().exec()
       const isUniquePromoAction = await mongoPromoAction.findOne({ productKaspiId: data.productKaspiId }).lean().exec()
