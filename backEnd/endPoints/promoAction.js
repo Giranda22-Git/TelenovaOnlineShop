@@ -47,7 +47,6 @@ router.post('/', upload.any(), async (req, res) => {
 
   let result = null
 
-  console.log('datecheck', new Date(data.timeOfPromoEnding) > new Date())
   if (new Date(data.timeOfPromoEnding) > new Date()) {
     if (data.productKaspiId) {
       const targetProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': data.productKaspiId }).lean().exec()
@@ -108,7 +107,7 @@ router.post('/', upload.any(), async (req, res) => {
       }
     }
   }
-  console.log('result', result)
+
   if (!result) {
     if (!filesDeletedFlag) {
       for (const file of files) {
@@ -118,7 +117,6 @@ router.post('/', upload.any(), async (req, res) => {
     filesDeletedFlag = true
     res.sendStatus(500)
   } else {
-    console.log('ok')
     let answer = await result.save()
     if (data.productKaspiId) {
 
@@ -263,9 +261,12 @@ function filesValidation (files, name) {
       return false
     }
     else {
+      const newFileName = name + index++ + `.${fileType[1]}`
+      fs.renameSync(tmpDir + file.filename, tmpDir + newFileName)
+
       image = {
-        clientPath: `${serverData.interiorServerUrl}promoAction/download/${file.filename}`,
-        fileName: file.filename
+        clientPath: `${serverData.interiorServerUrl}promoAction/download/${newFileName}`,
+        fileName: newFileName
       }
       images.push(image)
     }
