@@ -39,7 +39,7 @@ router.get('/download/:filename', (req, res) => {
 
 // begin create new promoAction
 
-router.post('/', upload.any(), async (req, res) => {
+router.post('/', await upload.any(), async (req, res) => {
   const data = req.body
   const files = req.files
   console.log(data)
@@ -261,12 +261,9 @@ function filesValidation (files, name) {
       return false
     }
     else {
-      const newFileName = name + index++ + `.${fileType[1]}`
-      fs.renameSync(tmpDir + file.filename, tmpDir + newFileName)
-
       image = {
-        clientPath: `${serverData.interiorServerUrl}promoAction/download/${newFileName}`,
-        fileName: newFileName
+        clientPath: `${serverData.interiorServerUrl}promoAction/download/${file.filename}`,
+        fileName: file.filename
       }
       images.push(image)
     }
