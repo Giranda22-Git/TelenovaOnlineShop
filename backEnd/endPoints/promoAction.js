@@ -79,7 +79,7 @@ router.post('/', upload.any(), async (req, res) => {
         filesDeletedFlag = true
       }
     }
-    else if (data.typeOfPromo === 1 || data.typeOfPromo === 5) {
+    else if (Number(data.typeOfPromo) === 1 || Number(data.typeOfPromo) === 5) {
       console.log('files')
       if (files) {
         const promoImages = filesValidation(files)
