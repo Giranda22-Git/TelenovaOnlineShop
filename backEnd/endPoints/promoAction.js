@@ -107,7 +107,7 @@ router.post('/', upload.any(), async (req, res) => {
       }
     }
   }
-
+  console.log('result', result)
   if (!result) {
     if (!filesDeletedFlag) {
       for (const file of files) {
@@ -117,6 +117,7 @@ router.post('/', upload.any(), async (req, res) => {
     filesDeletedFlag = true
     res.sendStatus(500)
   } else {
+    console.log('ok')
     let answer = await result.save()
     if (data.productKaspiId) {
 
