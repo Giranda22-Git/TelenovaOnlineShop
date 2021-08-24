@@ -39,7 +39,7 @@ router.get('/download/:filename', (req, res) => {
 
 // begin create new promoAction
 
-router.post('/', await upload.any(), async (req, res) => {
+router.post('/', upload.any(), async (req, res) => {
   const data = req.body
   const files = req.files
   console.log(data)
