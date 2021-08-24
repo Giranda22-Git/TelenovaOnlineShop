@@ -224,6 +224,23 @@ router.get('/typeOfPromo/:typeOfPromo', async (req, res) => {
 // end get promoActions by typeOfPromo
 
 
+// begin delete gvn promo
+
+router.delete('/govno', async (req, res) => {
+  const data = req.body
+
+  const targetJob = worker.scheduledJobs[String(data._id)]
+
+  if (targetJob) {
+    targetJob.cancel()
+  }
+
+  await deletePromoAction(data.id)
+})
+
+// end delete gvn promo
+
+
 // begin delete promoAction by id
 
 router.delete('/', async (req, res) => {
