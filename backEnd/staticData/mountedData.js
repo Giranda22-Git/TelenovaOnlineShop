@@ -2,6 +2,7 @@ const data = {
   mongoUrl: 'mongodb://localhost:27017/TelenovaOnlineShop',
 	serverUrl: 'http://localhost:3001/',
   interiorServerUrl: 'https://textforeva.ru/',
+  adminFrontUrl: 'http://82.146.62.154:8000/apps/invoice/preview/',
 	PORT: 3001
 }
 // https://textforeva.ru/

@@ -5,6 +5,7 @@ const mongoOrders = require('../models/Orders.js').mongoOrders
 const mongoStorage = require('../models/Storage.js').mongoStorage
 const mongoCategoryList = require('../models/CategoryList.js').mongoCategoryList
 const mongoPromoCode = require('../models/PromoCode.js').mongoPromoCode
+const mountedData = require('../staticData/mountedData.js').data
 
 
 // begin get all orders
@@ -78,20 +79,21 @@ router.post('/', async (req, res) => {
     creditMonth: data.creditMonth ? data.creditMonth : 0
   })
 
-  // let Query = `https://telenova.bitrix24.kz/rest/51/atlvkfldeh2wezg0/crm.lead.add.json?FIELDS[NAME]=${data.name}&FIELDS[PHONE][0][VALUE]=${data.phoneNumber}&FIELDS[PHONE][0][VALUE_TYPE]=WORK&FIELDS[ADDRESS]=${data.address}&FIELDS[PRODUCTS]=[`
-
-  // Query = encodeURI(Query)
-  // console.log(Query)
-
-  // await axios.get(Query)
-  //   .then(response => {
-  //     console.log(response.data)
-  //   })
-  //   .catch(err => {
-  //     console.log(err)
-  //   })
-
   const result = await newOrder.save()
+
+  let Query = `https://telenova.bitrix24.kz/rest/51/atlvkfldeh2wezg0/crm.lead.add.json?FIELDS[TITLE]=Новый лид&FIELDS[NAME]=${data.name}&FIELDS[PHONE][0][VALUE]=${data.phoneNumber}&FIELDS[PHONE][0][VALUE_TYPE]=WORK&FIELDS[ADDRESS]=${data.address}&FIELDS[COMMENTS]=${mountedData.adminFrontUrl + result._id}`
+
+  Query = encodeURI(Query)
+  console.log(Query)
+
+  await axios.get(Query)
+    .then(response => {
+      console.log(response.data)
+    })
+    .catch(err => {
+      console.log(err)
+    })
+
   res.json(result)
 })
 /*
