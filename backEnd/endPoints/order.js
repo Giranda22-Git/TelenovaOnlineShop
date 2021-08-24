@@ -81,7 +81,7 @@ router.post('/', async (req, res) => {
 
   const result = await newOrder.save()
 
-  let Query = `https://telenova.bitrix24.kz/rest/51/atlvkfldeh2wezg0/crm.lead.add.json?FIELDS[TITLE]=Заказ из инетернет магазина&FIELDS[NAME]=${data.name}&FIELDS[PHONE][0][VALUE]=${data.phoneNumber}&FIELDS[PHONE][0][VALUE_TYPE]=WORK&FIELDS[ADDRESS]=${data.address}&FIELDS[COMMENTS]=${mountedData.adminFrontUrl + result._id}`
+  let Query = `https://telenova.bitrix24.kz/rest/51/atlvkfldeh2wezg0/crm.lead.add.json?FIELDS[TITLE]=Заказ из инетернет магазина&FIELDS[NAME]=${data.name}&FIELDS[PHONE][0][VALUE]=${data.phoneNumber}&FIELDS[OPPORTUNITY]=${result.finishPrice}&FIELDS[PHONE][0][VALUE_TYPE]=WORK&FIELDS[ADDRESS]=${data.address}&FIELDS[COMMENTS]=${mountedData.adminFrontUrl + result._id}`
 
   Query = encodeURI(Query)
   console.log(Query)
