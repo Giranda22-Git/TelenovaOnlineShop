@@ -86,6 +86,7 @@ router.post('/', upload.any(), async (req, res) => {
           bigPromoText: data.bigPromoText ? data.bigPromoText : '',
           smallPromoText: data.smallPromoText ? data.smallPromoText : '',
           customMinPrice: data.customMinPrice ? data.customMinPrice : '',
+          link: data.link ? data.link : '',
           timeOfPromoEnding: new Date(data.timeOfPromoEnding),
           sale: data.sale,
           promoImages

@@ -5,6 +5,10 @@ const promoAction = new mongoose.Schema({
     type: Number,
     required: true
   },
+  link: {
+    type: String,
+    default: ''
+  },
   customMinPrice: {
     type: String,
     default: ''
