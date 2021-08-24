@@ -50,6 +50,7 @@ router.post('/', upload.any(), async (req, res) => {
   if (new Date(data.timeOfPromoEnding) > new Date()) {
     console.log('true time')
     if (data.productKaspiId) {
+      console.log('product')
       const targetProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': data.productKaspiId }).lean().exec()
       const isUniquePromoAction = await mongoPromoAction.findOne({ productKaspiId: data.productKaspiId }).lean().exec()
       console.log(Boolean(targetProduct), Boolean(files), Boolean(!isUniquePromoAction))
@@ -79,6 +80,7 @@ router.post('/', upload.any(), async (req, res) => {
       }
     }
     else if (data.typeOfPromo === 1 || data.typeOfPromo === 5) {
+      console.log('files')
       if (files) {
         const promoImages = filesValidation(files)
         result = mongoPromoAction({
@@ -96,6 +98,7 @@ router.post('/', upload.any(), async (req, res) => {
       }
     }
     else if (data.categoryName) {
+      console.log('category')
       const targetCategory = await mongoCategoryList.findOne({ name: data.categoryName }).lean().exec()
       const isUniquePromoAction = await mongoPromoAction.findOne({ categoryName: data.categoryName }).lean().exec()
       console.log(Boolean(targetCategory), Boolean(files), Boolean(!isUniquePromoAction))
