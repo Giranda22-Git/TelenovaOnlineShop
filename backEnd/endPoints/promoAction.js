@@ -47,6 +47,7 @@ router.post('/', upload.any(), async (req, res) => {
 
   let result = null
 
+  console.log('datecheck', new Date(data.timeOfPromoEnding) > new Date())
   if (new Date(data.timeOfPromoEnding) > new Date()) {
     if (data.productKaspiId) {
       const targetProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': data.productKaspiId }).lean().exec()
