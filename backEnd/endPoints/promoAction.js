@@ -228,14 +228,19 @@ router.get('/typeOfPromo/:typeOfPromo', async (req, res) => {
 
 router.delete('/govno', async (req, res) => {
   const data = req.body
+  const targetPromoAction = await mongoPromoAction.findById(data.id).lean().exec()
+  if (targetPromoAction) {
+    const targetJob = worker.scheduledJobs[String(data.id)]
 
-  const targetJob = worker.scheduledJobs[String(data._id)]
+    if (targetJob) {
+      targetJob.cancel()
+    }
 
-  if (targetJob) {
-    targetJob.cancel()
+    await deletePromoAction(data.id)
+    res.sendStatus(200)
+  } else {
+    res.sendStatus(500)
   }
-
-  await deletePromoAction(data.id)
 })
 
 // end delete gvn promo
