@@ -79,7 +79,7 @@ async function restartPromoActionWorkers () {
         console.log('promo action worker has been deleted')
       }
     }
-    else if (data.typeOfPromo === 1 || data.typeOfPromo === 5) {
+    else if (promoAction.typeOfPromo === 1 || promoAction.typeOfPromo === 5) {
       if (new Date(promoAction.timeOfPromoEnding) > new Date()) {
         worker.scheduleJob(String(promoAction._id), new Date(promoAction.timeOfPromoEnding), async (y) => {
           console.log(y)
