@@ -320,7 +320,7 @@ function filesValidation (files, name) {
 
 async function deletePromoAction (id) {
   const targetPromoAction = await mongoPromoAction.findById(id).lean().exec()
-  console.log(targetPromoAction)
+  console.log(id)
   for (const file of targetPromoAction.promoImages) {
     delBadFile(file.fileName)
   }
