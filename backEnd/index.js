@@ -41,6 +41,7 @@ async function init(serverData) {
     app.use('/promoCode', require('./endPoints/promoCode.js'))
     app.use('/promoAction', require('./endPoints/promoAction.js'))
     app.use('/systemSetting', require('./endPoints/systemSettings.js'))
+    app.use('/sale', require('./endPoints/sale.js'))
 	})
 	mongoose.connection.emit('open')
 }

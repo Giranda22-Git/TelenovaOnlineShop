@@ -5,6 +5,10 @@ const promoAction = new mongoose.Schema({
     type: Number,
     required: true
   },
+  customMinPrice: {
+    type: String,
+    default: ''
+  },
   productKaspiId: {
     type: String,
     default: ''

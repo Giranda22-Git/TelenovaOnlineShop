@@ -545,8 +545,9 @@ content-type: application/json
 // begin remove similar goods
 router.post('/removeSimilarGoods', async (req, res) => {
   const data = req.body
-
-  await mongoStorage.updateOne({ 'offerData.kaspi_id': data.kaspi_id }, { $pull: { similarProductsId: { $in: data.similarProductsId } } }).exec()
+  console.log(data)
+  const result = await mongoStorage.updateOne({ 'offerData.kaspi_id': data.kaspi_id }, { $pull: { similarProductsId: { $in: data.similarProductsId } } }).exec()
+  console.log('remove similar: ', result)
   res.sendStatus(200)
 })
 /*

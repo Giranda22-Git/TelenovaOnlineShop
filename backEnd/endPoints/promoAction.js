@@ -42,7 +42,6 @@ router.get('/download/:filename', (req, res) => {
 router.post('/', upload.any(), async (req, res) => {
   const data = req.body
   const files = req.files
-  console.log(files)
   console.log(data)
   let filesDeletedFlag = false
 
@@ -63,6 +62,7 @@ router.post('/', upload.any(), async (req, res) => {
           name: data.name ? data.name : '',
           bigPromoText: data.bigPromoText ? data.bigPromoText : '',
           smallPromoText: data.smallPromoText ? data.smallPromoText : '',
+          customMinPrice: data.customMinPrice ? data.customMinPrice : '',
           timeOfPromoEnding: new Date(data.timeOfPromoEnding),
           sale: data.sale,
           productImages: targetProduct.offerData.images,
@@ -75,6 +75,21 @@ router.post('/', upload.any(), async (req, res) => {
           delBadFile(file.filename)
         }
         filesDeletedFlag = true
+      }
+    }
+    else if (data.typeOfPromo === 1 || data.typeOfPromo === 5) {
+      if (files) {
+        const promoImages = filesValidation(files)
+        result = mongoPromoAction({
+          typeOfPromo: data.typeOfPromo,
+          name: data.name ? data.name : '',
+          bigPromoText: data.bigPromoText ? data.bigPromoText : '',
+          smallPromoText: data.smallPromoText ? data.smallPromoText : '',
+          customMinPrice: data.customMinPrice ? data.customMinPrice : '',
+          timeOfPromoEnding: new Date(data.timeOfPromoEnding),
+          sale: data.sale,
+          promoImages
+        })
       }
     }
     else if (data.categoryName) {
@@ -94,6 +109,7 @@ router.post('/', upload.any(), async (req, res) => {
           name: data.name ? data.name : '',
           bigPromoText: data.bigPromoText ? data.bigPromoText : '',
           smallPromoText: data.smallPromoText ? data.smallPromoText : '',
+          customMinPrice: data.customMinPrice ? data.customMinPrice : '',
           timeOfPromoEnding: new Date(data.timeOfPromoEnding),
           sale: data.sale,
           categoryImage: targetCategory.image,
@@ -129,6 +145,13 @@ router.post('/', upload.any(), async (req, res) => {
         await promoActionMiddleware(answer._id, -1, false)
 
         deletePromoAction(answer._id)
+      })
+    }
+    else if (data.typeOfPromo === 1 || data.typeOfPromo === 5) {
+      worker.scheduleJob(String(answer._id), new Date(data.timeOfPromoEnding), async (y) => {
+        console.log(y)
+
+        await mongoPromoAction.deleteOne({ _id: answer._id })
       })
     }
     else if (data.categoryName) {
