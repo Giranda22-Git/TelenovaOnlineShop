@@ -91,6 +91,7 @@ router.post('/', upload.any(), async (req, res) => {
           sale: data.sale,
           promoImages
         })
+        console.log(result)
       }
     }
     else if (data.categoryName) {
