@@ -43,6 +43,7 @@ router.post('/', upload.any(), async (req, res) => {
   const data = req.body
   const files = req.files
   console.log(data)
+  const linkRequiredArray = [1, 4, 5, 6, 7]
   let filesDeletedFlag = false
 
   let result = null
@@ -79,7 +80,7 @@ router.post('/', upload.any(), async (req, res) => {
         filesDeletedFlag = true
       }
     }
-    else if (Number(data.typeOfPromo) === 1 || Number(data.typeOfPromo) === 5) {
+    else if (linkRequiredArray.includes(Number(data.typeOfPromo))) {
       console.log('files')
       if (files) {
         const promoImages = filesValidation(files)
@@ -153,7 +154,7 @@ router.post('/', upload.any(), async (req, res) => {
         deletePromoAction(answer._id)
       })
     }
-    else if (data.typeOfPromo === 1 || data.typeOfPromo === 5) {
+    else if (linkRequiredArray.includes(Number(data.typeOfPromo))) {
       worker.scheduleJob(String(answer._id), new Date(data.timeOfPromoEnding), async (y) => {
         console.log(y)
 
