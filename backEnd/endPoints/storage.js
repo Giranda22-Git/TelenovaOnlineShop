@@ -729,7 +729,7 @@ wsClient.on('connection', async (client, data) => {
           }
           else if (key === "priceRange") {
             shop = shop.filter(element => {
-              return element.offerData.price >= data.filters[key][0] && element.offerData.price <= data.filters[key][1]
+              return element.offerData.price >= Number(data.filters[key][0]) && element.offerData.price <= Number(data.filters[key][1])
             })
           }
           else if (key === "switchers") {
