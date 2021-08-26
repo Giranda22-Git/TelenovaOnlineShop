@@ -907,7 +907,7 @@ wsClient.on('connection', async (client, data) => {
 
       const filterKeys = {}
 
-      if (!data.query) {
+      if (true) { // !data.query
         allProducts = await mongoStorage.find({ active: true }, {
           active: true,
           salePrice: true,
