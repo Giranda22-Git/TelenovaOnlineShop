@@ -901,91 +901,93 @@ wsClient.on('connection', async (client, data) => {
         shop = finishAnswerArray
       }
 
-      if (shop.length === 0) client.send(JSON.stringify({ priceRange: [0,0], filterKeys: [], products: [] }))
-
-      let allProducts = []
-
-      const filterKeys = {}
-
-      if (true) { // !data.query
-        allProducts = await mongoStorage.find({ active: true }, {
-          active: true,
-          salePrice: true,
-          sale: true,
-          'offerData.category_list': true,
-          'offerData.images': true,
-          'offerData.name': true,
-          'offerData.price': true,
-          'offerData.kaspi_id': true,
-          'offerData.kaspi_rating': true,
-          'offerData.properties': true
-        }).lean().exec()
-
-        for (const key in data.filters) {
-          if (key === "firstLevelCategory") {
-            allProducts = allProducts.filter(element => {
-              return element.offerData.category_list[0] === data.filters[key]
-            })
-          }
-          else if (key === "secondLevelCategory") {
-            allProducts = allProducts.filter(element => {
-              return element.offerData.category_list[1] === data.filters[key]
-            })
-          }
-          else if (key === "thirdLevelCategory") {
-            allProducts = allProducts.filter(element => {
-              return element.offerData.category_list[2] === data.filters[key]
-            })
-          }
-        }
-
-        for (const product of allProducts) {
-          for (const property of Object.keys(product.offerData.properties)) {
-            if (!(Object.keys(filterKeys).includes(property))) {
-              filterKeys[property] = new Array()
-            }
-
-            if (!(filterKeys[property].includes(product.offerData.properties[property]))) {
-              filterKeys[property].push(product.offerData.properties[property])
-            }
-          }
-        }
+      if (shop.length === 0) {
+        client.send(JSON.stringify({ priceRange: [0,0], filterKeys: [], products: [] }))
       } else {
-        for (const product of shop) {
-          for (const property of Object.keys(product.offerData.properties)) {
-            if (!(Object.keys(filterKeys).includes(property))) {
-              filterKeys[property] = new Array()
-            }
+        let allProducts = []
 
-            if (!(filterKeys[property].includes(product.offerData.properties[property]))) {
-              filterKeys[property].push(product.offerData.properties[property])
+        const filterKeys = {}
+
+        if (!data.query) {
+          allProducts = await mongoStorage.find({ active: true }, {
+            active: true,
+            salePrice: true,
+            sale: true,
+            'offerData.category_list': true,
+            'offerData.images': true,
+            'offerData.name': true,
+            'offerData.price': true,
+            'offerData.kaspi_id': true,
+            'offerData.kaspi_rating': true,
+            'offerData.properties': true
+          }).lean().exec()
+
+          for (const key in data.filters) {
+            if (key === "firstLevelCategory") {
+              allProducts = allProducts.filter(element => {
+                return element.offerData.category_list[0] === data.filters[key]
+              })
+            }
+            else if (key === "secondLevelCategory") {
+              allProducts = allProducts.filter(element => {
+                return element.offerData.category_list[1] === data.filters[key]
+              })
+            }
+            else if (key === "thirdLevelCategory") {
+              allProducts = allProducts.filter(element => {
+                return element.offerData.category_list[2] === data.filters[key]
+              })
             }
           }
+
+          for (const product of allProducts) {
+            for (const property of Object.keys(product.offerData.properties)) {
+              if (!(Object.keys(filterKeys).includes(property))) {
+                filterKeys[property] = new Array()
+              }
+
+              if (!(filterKeys[property].includes(product.offerData.properties[property]))) {
+                filterKeys[property].push(product.offerData.properties[property])
+              }
+            }
+          }
+        } else {
+          for (const product of shop) {
+            for (const property of Object.keys(product.offerData.properties)) {
+              if (!(Object.keys(filterKeys).includes(property))) {
+                filterKeys[property] = new Array()
+              }
+
+              if (!(filterKeys[property].includes(product.offerData.properties[property]))) {
+                filterKeys[property].push(product.offerData.properties[property])
+              }
+            }
+          }
+
+          shop.forEach(element => {
+            allProducts.push(element)
+          })
         }
 
-        shop.forEach(element => {
-          allProducts.push(element)
+        allProducts.sort(function (a, b) {
+          if (a.offerData.price < b.offerData.price) {
+            return -1
+          }
+          if (a.offerData.price > b.offerData.price) {
+            return 1
+          }
+          return 0
         })
-      }
 
-      allProducts.sort(function (a, b) {
-        if (a.offerData.price < b.offerData.price) {
-          return -1
+        const finishAnswer = {
+          priceRange: [allProducts[0].offerData.price, allProducts[allProducts.length - 1].offerData.price],
+          filterKeys,
+          products: shop
         }
-        if (a.offerData.price > b.offerData.price) {
-          return 1
-        }
-        return 0
-      })
-
-      const finishAnswer = {
-        priceRange: [allProducts[0].offerData.price, allProducts[allProducts.length - 1].offerData.price],
-        filterKeys,
-        products: shop
+        const end = new Date().getTime()
+        console.log(`SecondWay WS: ${end - start}ms`)
+        client.send(JSON.stringify(finishAnswer))
       }
-      const end = new Date().getTime()
-      console.log(`SecondWay WS: ${end - start}ms`)
-      client.send(JSON.stringify(finishAnswer))
     }
   })
   // end ws search
