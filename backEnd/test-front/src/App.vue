@@ -20,7 +20,7 @@ export default {
     categoryName: 'Фото- и видеокамеры',
     typeOfPromo: 1,
     bigPromoText: 'asdadascdssd',
-    timeOfPromoEnding: '2021-08-21T23:07:04.895Z',
+    timeOfPromoEnding: '2021-08-26T06:58:37.708Z',
     sale: 20,
     resData: null
   }),

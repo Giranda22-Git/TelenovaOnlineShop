@@ -2,6 +2,7 @@ const router = require('express').Router()
 
 const mongoSale = require('../models/Sales.js').mongoSale
 const mongoStorage = require('../models/Storage.js').mongoStorage
+const mongoPromoAction = require('../models/PromoAction.js').mongoPromoAction
 
 
 // begin get all sales
@@ -34,41 +35,48 @@ router.post('/', async (req, res) => {
   }).lean().exec()
 
   if (targetProduct) {
-    const isUnique = await mongoSale.findOne({ 'productKaspiIdData.offerData.kaspi_id': data.productKaspiId }).lean().exec()
+    const activePromo = await mongoPromoAction.findOne({ productKaspiId: data.productKaspiId }).lean().exec()
 
-    if (isUnique) {
-      await deleteSale(data.productKaspiId)
-    }
+    if (!activePromo) {
 
-    const newSale = mongoSale({
-      productKaspiIdData: targetProduct,
-      sale: data.sale
-    })
-    const result = await newSale.save()
+      const isUnique = await mongoSale.findOne({ 'productKaspiIdData.offerData.kaspi_id': data.productKaspiId }).lean().exec()
 
-    if (result._id) {
-      await mongoStorage.updateOne({ 'offerData.kaspi_id': data.productKaspiId }, {
-        $inc: { sale: data.sale, salePrice: -(targetProduct.offerData.price * (data.sale / 100)) }
-      }).exec()
+      if (isUnique) {
+        await deleteSale(data.productKaspiId)
+      }
 
-      const resultProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': data.productKaspiId }, {
-        active: true,
-        salePrice: true,
-        sale: true,
-        'offerData.category_list': true,
-        'offerData.images': true,
-        'offerData.name': true,
-        'offerData.price': true,
-        'offerData.kaspi_id': true,
-        'offerData.kaspi_rating': true
-      }).lean().exec()
+      const newSale = mongoSale({
+        productKaspiIdData: targetProduct,
+        sale: data.sale
+      })
+      const result = await newSale.save()
 
-      res.json(resultProduct)
+      if (result._id) {
+        await mongoStorage.updateOne({ 'offerData.kaspi_id': data.productKaspiId }, {
+          $inc: { sale: data.sale, salePrice: -(targetProduct.offerData.price * (data.sale / 100)) }
+        }).exec()
+
+        const resultProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': data.productKaspiId }, {
+          active: true,
+          salePrice: true,
+          sale: true,
+          'offerData.category_list': true,
+          'offerData.images': true,
+          'offerData.name': true,
+          'offerData.price': true,
+          'offerData.kaspi_id': true,
+          'offerData.kaspi_rating': true
+        }).lean().exec()
+
+        res.json(resultProduct)
+      } else {
+        res.sendStatus(500)
+      }
     } else {
-      res.sendStatus(500)
+      res.json({ message: 'этот продукт учавствует в промоакции поэтому ему нельзя установить скидку!' })
     }
   } else {
-    res.status(500).json({ message: 'такого товара не существует' })
+    res.json({ message: 'такого товара не существует' })
   }
 })
 /*

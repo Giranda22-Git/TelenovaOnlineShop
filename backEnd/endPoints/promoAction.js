@@ -10,6 +10,7 @@ const mongoStorage = require('../models/Storage.js').mongoStorage
 const mongoCategoryList = require('../models/CategoryList.js').mongoCategoryList
 
 const promoActionMiddleware = require('../staticData/supFunctions.js').promoActionMiddleware
+const mongoSale= require('../models/Sales.js').mongoSale
 
 const tmpDir = __dirname + '/promoActionsImages/'
 const upload = multer({ dest: __dirname + '/promoActionsImages/', limits: { fileSize: 15000000 } })
@@ -47,11 +48,16 @@ router.post('/', upload.any(), async (req, res) => {
   let filesDeletedFlag = false
 
   let result = null
-  console.log('bad time')
+
   if (new Date(data.timeOfPromoEnding) > new Date()) {
-    console.log('true time')
     if (data.productKaspiId) {
-      console.log('product')
+
+      const activeSale = await mongoSale.findOne({ 'productKaspiIdData.offerData.kaspi_id': data.productKaspiId }).lean().exec()
+
+      if (activeSale) {
+        await deleteSale(data.productKaspiId)
+      }
+
       const targetProduct = await mongoStorage.findOne({ 'offerData.kaspi_id': data.productKaspiId }).lean().exec()
       const isUniquePromoAction = await mongoPromoAction.findOne({ productKaspiId: data.productKaspiId }).lean().exec()
       console.log(Boolean(targetProduct), Boolean(files), Boolean(!isUniquePromoAction))
@@ -66,6 +72,7 @@ router.post('/', upload.any(), async (req, res) => {
           bigPromoText: data.bigPromoText ? data.bigPromoText : '',
           smallPromoText: data.smallPromoText ? data.smallPromoText : '',
           customMinPrice: data.customMinPrice ? data.customMinPrice : '',
+          link: data.link ? data.link : '',
           timeOfPromoEnding: new Date(data.timeOfPromoEnding),
           sale: data.sale,
           productImages: targetProduct.offerData.images,
@@ -81,7 +88,6 @@ router.post('/', upload.any(), async (req, res) => {
       }
     }
     else if (linkRequiredArray.includes(Number(data.typeOfPromo))) {
-      console.log('files')
       if (files) {
         const promoImages = filesValidation(files)
         result = mongoPromoAction({
@@ -99,7 +105,6 @@ router.post('/', upload.any(), async (req, res) => {
       }
     }
     else if (data.categoryName) {
-      console.log('category')
       const targetCategory = await mongoCategoryList.findOne({ name: data.categoryName }).lean().exec()
       const isUniquePromoAction = await mongoPromoAction.findOne({ categoryName: data.categoryName }).lean().exec()
       console.log(Boolean(targetCategory), Boolean(files), Boolean(!isUniquePromoAction))
@@ -297,6 +302,19 @@ content-type: application/json
 
 function delBadFile(fileName) {
   fs.unlinkSync(tmpDir + fileName)
+}
+
+async function deleteSale (productKaspiId) {
+  const targetSale = await mongoSale.findOne({ 'productKaspiIdData.offerData.kaspi_id': productKaspiId }).lean().exec()
+  console.log(targetSale)
+  const result = await mongoStorage.updateOne(
+    { 'offerData.kaspi_id': productKaspiId },
+    { $inc: { sale: -targetSale.sale, salePrice: (targetSale.productKaspiIdData.offerData.price * (targetSale.sale / 100)) } }
+  )
+
+  if (result.nModified) {
+    await mongoSale.deleteOne({ 'productKaspiIdData.offerData.kaspi_id': productKaspiId })
+  }
 }
 
 function filesValidation (files, name) {
