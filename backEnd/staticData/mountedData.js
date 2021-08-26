@@ -1,5 +1,5 @@
 const data = {
-  mongoUrl: 'mongodb://localhost:27017/TelenovaOnlineShop',
+  mongoUrl: 'mongodb://sasha:spore005@143.244.163.105:27017/TelenovaOnlineShop?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false',
 	serverUrl: 'http://localhost:3001/',
   interiorServerUrl: 'https://textforeva.ru/',
   adminFrontUrl: 'http://82.146.62.154:8000/apps/invoice/preview/',
