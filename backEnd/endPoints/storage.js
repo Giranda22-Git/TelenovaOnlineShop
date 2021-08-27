@@ -126,7 +126,8 @@ router.get('/', async (req, res) => {
     'offerData.name': true,
     'offerData.price': true,
     'offerData.kaspi_id': true,
-    'offerData.kaspi_rating': true
+    'offerData.kaspi_rating': true,
+    'offerData.actual_supplier': true
   }).lean().exec()
   const end = new Date().getTime()
   res.status(200).json(result)
