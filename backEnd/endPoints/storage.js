@@ -722,7 +722,8 @@ wsClient.on('connection', async (client, data) => {
         'offerData.price': true,
         'offerData.kaspi_id': true,
         'offerData.kaspi_rating': true,
-        'offerData.properties': true
+        'offerData.properties': true,
+        'offerData.actual_supplier': true
       }).lean().exec()
 
       if (data.filters) {
@@ -934,7 +935,8 @@ wsClient.on('connection', async (client, data) => {
             'offerData.price': true,
             'offerData.kaspi_id': true,
             'offerData.kaspi_rating': true,
-            'offerData.properties': true
+            'offerData.properties': true,
+            'offerData.actual_supplier': true
           }).lean().exec()
 
           for (const key in data.filters) {
