@@ -319,9 +319,8 @@ async function deleteSale (productKaspiId) {
 
 async function filesValidation (files, name) {
   let images = []
-  let index = 0
-  files.forEach(async file => {
 
+  for (const file of files) {
     const validTypes = ['svg+xml', 'png', 'gif', 'jpeg', 'jpg']
 
     const fileType = file.mimetype.split('/')
@@ -333,6 +332,7 @@ async function filesValidation (files, name) {
     }
     else {
       const newFileName = `${file.filename}.${fileType[1]}`
+      console.log(newFileName)
 
       await fs.promises.rename(tmpDir + file.filename, tmpDir + newFileName)
 
@@ -340,9 +340,10 @@ async function filesValidation (files, name) {
         clientPath: `${serverData.interiorServerUrl}promoAction/download/${newFileName}`,
         fileName: newFileName
       }
+      console.log(image)
       images.push(image)
     }
-  })
+  }
   return images
 }
 
