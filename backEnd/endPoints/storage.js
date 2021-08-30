@@ -492,7 +492,7 @@ router.get('/on_kaspi', async (req, res) => {
 // begin get all goods by prev_kaspi
 
 router.get('/prev_kaspi', async (req, res) => {
-  const result = await mongoStorage.find({ 'offerData.prev_kaspi': { $ne: false } }, { 'offerData.kaspi_id': true, 'offerData.prev_kaspi': true, 'offerData.on_kaspi': true, 'offerData.name': true  }).lean().exec()
+  const result = await mongoStorage.find({ 'offerData.prev_kaspi': { $ne: false } }, { 'offerData.kaspi_id': true, 'offerData.prev_kaspi': true, 'offerData.on_kaspi': true, 'offerData.name': true, salePrice: true  }).lean().exec()
   res.json(result)
 })
 
