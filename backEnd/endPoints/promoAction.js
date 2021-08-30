@@ -2,6 +2,7 @@ const router = require('express').Router()
 const worker = require('node-schedule')
 const multer = require('multer')
 const fs = require('fs')
+const { promises: Fs } = require('fs')
 
 const mongoPromoAction = require('../models/PromoAction.js').mongoPromoAction
 
@@ -333,8 +334,8 @@ async function filesValidation (files, name) {
     else {
       const newFileName = `${file.filename}.${fileType[1]}`
       console.log(newFileName)
-
-      await fs.promises.rename(tmpDir + file.filename, tmpDir + newFileName)
+      console.log(Fs)
+      await Fs.rename(tmpDir + file.filename, tmpDir + newFileName)
 
       image = {
         clientPath: `${serverData.interiorServerUrl}promoAction/download/${newFileName}`,
