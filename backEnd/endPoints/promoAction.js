@@ -317,7 +317,7 @@ async function deleteSale (productKaspiId) {
   }
 }
 
-function filesValidation (files, name) {
+async function filesValidation (files, name) {
   let images = []
   let index = 0
   files.forEach(file => {
@@ -332,9 +332,13 @@ function filesValidation (files, name) {
       return false
     }
     else {
+      const newFileName = `${file.filename}.${fileType[1]}`
+
+      await fs.promises.rename(tmpDir + file.filename, tmpDir + newFileName)
+
       image = {
-        clientPath: `${serverData.interiorServerUrl}promoAction/download/${file.filename}`,
-        fileName: file.filename
+        clientPath: `${serverData.interiorServerUrl}promoAction/download/${newFileName}`,
+        fileName: newFileName
       }
       images.push(image)
     }
