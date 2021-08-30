@@ -2,7 +2,6 @@ const router = require('express').Router()
 const worker = require('node-schedule')
 const multer = require('multer')
 const fs = require('fs')
-const { promises: Fs } = require('fs')
 
 const mongoPromoAction = require('../models/PromoAction.js').mongoPromoAction
 
@@ -49,7 +48,7 @@ router.post('/', upload.any(), async (req, res) => {
   let filesDeletedFlag = false
 
   let result = null
-
+  console.log(new Date(data.timeOfPromoEnding) > new Date())
   if (new Date(data.timeOfPromoEnding) > new Date()) {
     if (data.productKaspiId) {
 
@@ -63,7 +62,7 @@ router.post('/', upload.any(), async (req, res) => {
       const isUniquePromoAction = await mongoPromoAction.findOne({ productKaspiId: data.productKaspiId }).lean().exec()
       console.log(Boolean(targetProduct), Boolean(files), Boolean(!isUniquePromoAction))
       if (targetProduct && files && !isUniquePromoAction) {
-        const promoImages = await filesValidation(files, targetProduct.offerData.kaspi_name)
+        const promoImages = filesValidation(files, targetProduct.offerData.kaspi_name)
 
         result = mongoPromoAction({
           typeOfPromo: data.typeOfPromo,
@@ -90,7 +89,7 @@ router.post('/', upload.any(), async (req, res) => {
     }
     else if (linkRequiredArray.includes(Number(data.typeOfPromo))) {
       if (files) {
-        const promoImages = await filesValidation(files)
+        const promoImages = filesValidation(files)
         result = mongoPromoAction({
           typeOfPromo: data.typeOfPromo,
           name: data.name ? data.name : '',
@@ -114,7 +113,7 @@ router.post('/', upload.any(), async (req, res) => {
 
         categoryProducts.sort((a, b) => a.offerData.price - b.offerData.price)
 
-        const promoImages = await filesValidation(files, targetCategory.name)
+        const promoImages = filesValidation(files, targetCategory.name)
 
         result = mongoPromoAction({
           typeOfPromo: data.typeOfPromo,
@@ -318,7 +317,7 @@ async function deleteSale (productKaspiId) {
   }
 }
 
-async function filesValidation (files, name) {
+function filesValidation (files, name) {
   let images = []
 
   for (const file of files) {
@@ -334,8 +333,11 @@ async function filesValidation (files, name) {
     else {
       const newFileName = `${file.filename}.${fileType[1]}`
       console.log(newFileName)
-      console.log(Fs)
-      await Fs.rename(tmpDir + file.filename, tmpDir + newFileName)
+      //console.log(fs)
+      fs.rename(tmpDir + file.filename, tmpDir + newFileName, (err) => {
+        if (err) console.log(err)
+        console.log('rename complete!')
+      })
 
       image = {
         clientPath: `${serverData.interiorServerUrl}promoAction/download/${newFileName}`,
