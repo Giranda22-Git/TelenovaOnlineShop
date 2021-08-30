@@ -62,7 +62,7 @@ router.post('/', upload.any(), async (req, res) => {
       const isUniquePromoAction = await mongoPromoAction.findOne({ productKaspiId: data.productKaspiId }).lean().exec()
       console.log(Boolean(targetProduct), Boolean(files), Boolean(!isUniquePromoAction))
       if (targetProduct && files && !isUniquePromoAction) {
-        const promoImages = filesValidation(files, targetProduct.offerData.kaspi_name)
+        const promoImages = await filesValidation(files, targetProduct.offerData.kaspi_name)
 
         result = mongoPromoAction({
           typeOfPromo: data.typeOfPromo,
@@ -89,7 +89,7 @@ router.post('/', upload.any(), async (req, res) => {
     }
     else if (linkRequiredArray.includes(Number(data.typeOfPromo))) {
       if (files) {
-        const promoImages = filesValidation(files)
+        const promoImages = await filesValidation(files)
         result = mongoPromoAction({
           typeOfPromo: data.typeOfPromo,
           name: data.name ? data.name : '',
@@ -113,7 +113,7 @@ router.post('/', upload.any(), async (req, res) => {
 
         categoryProducts.sort((a, b) => a.offerData.price - b.offerData.price)
 
-        const promoImages = filesValidation(files, targetCategory.name)
+        const promoImages = await filesValidation(files, targetCategory.name)
 
         result = mongoPromoAction({
           typeOfPromo: data.typeOfPromo,
@@ -320,7 +320,7 @@ async function deleteSale (productKaspiId) {
 async function filesValidation (files, name) {
   let images = []
   let index = 0
-  files.forEach(file => {
+  files.forEach(async file => {
 
     const validTypes = ['svg+xml', 'png', 'gif', 'jpeg', 'jpg']
 
