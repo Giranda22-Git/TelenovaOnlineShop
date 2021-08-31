@@ -5,6 +5,7 @@ const data = {
   adminFrontUrl: 'http://82.146.62.154:8000/apps/invoice/preview/',
 	PORT: 3001
 }
+//mongodb://sasha:spore005@143.244.163.105:27017/TelenovaOnlineShop?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false
 // https://textforeva.ru/
 const mongoCategoryTree = require('../models/CategoryTree.js').mongoCategoryTree
 const mongoStorage = require('../models/Storage.js').mongoStorage
@@ -58,6 +59,7 @@ function delBadFile(fileName) {
 const promoActionMiddleware = require('./supFunctions.js').promoActionMiddleware
 
 async function restartPromoActionWorkers () {
+  const linkRequiredArray = [1, 4, 5, 6, 7]
   const promoActions = await mongoPromoAction.find().lean().exec()
 
   for (const promoAction of promoActions) {
@@ -79,7 +81,7 @@ async function restartPromoActionWorkers () {
         console.log('promo action worker has been deleted')
       }
     }
-    else if (promoAction.typeOfPromo === 1 || promoAction.typeOfPromo === 5) {
+    else if (linkRequiredArray.includes(Number(promoAction.typeOfPromo))) {
       if (new Date(promoAction.timeOfPromoEnding) > new Date()) {
         worker.scheduleJob(String(promoAction._id), new Date(promoAction.timeOfPromoEnding), async (y) => {
           console.log(y)

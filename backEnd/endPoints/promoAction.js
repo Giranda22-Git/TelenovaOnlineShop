@@ -114,7 +114,7 @@ router.post('/', upload.any(), async (req, res) => {
         categoryProducts.sort((a, b) => a.offerData.price - b.offerData.price)
 
         const promoImages = filesValidation(files, targetCategory.name)
-        console.log('u');
+
         result = mongoPromoAction({
           typeOfPromo: data.typeOfPromo,
           categoryName: data.categoryName,
