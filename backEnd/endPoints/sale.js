@@ -50,6 +50,7 @@ router.post('/', async (req, res) => {
         sale: data.sale
       })
       const result = await newSale.save()
+      console.log('result: ', result)
 
       if (result._id) {
         await mongoStorage.updateOne({ 'offerData.kaspi_id': data.productKaspiId }, {
@@ -118,10 +119,8 @@ async function deleteSale (productKaspiId) {
     { 'offerData.kaspi_id': productKaspiId },
     { $inc: { sale: -targetSale.sale, salePrice: (targetSale.productKaspiIdData.offerData.price * (targetSale.sale / 100)) } }
   )
-  console.log('result: ', result)
-  if (result.nModified) {
-    await mongoSale.deleteOne({ 'productKaspiIdData.offerData.kaspi_id': productKaspiId })
-  }
+
+  await mongoSale.deleteOne({ 'productKaspiIdData.offerData.kaspi_id': productKaspiId })
 }
 
 
