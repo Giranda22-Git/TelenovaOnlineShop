@@ -819,11 +819,11 @@ wsClient.on('connection', async (client, data) => {
         const queryArray = data.query.toLowerCase().split('')
         const resultArray = new Array()
         shop.forEach((product) => {
-          let productName = product.offerData.name.toLowerCase()
+          let preProductName = product.offerData.name.toLowerCase()
           let coincidence = 0
-          // productName.includes(data.query.toLowerCase())
+          // preProductName.includes(data.query.toLowerCase())
 
-          if (productName.includes(data.query.toLowerCase())) {
+          if (preProductName.includes(data.query.toLowerCase())) {
             const resProduct = {
               symbolsRangeAverage: 0,
               tmpProduct: product
@@ -834,7 +834,7 @@ wsClient.on('connection', async (client, data) => {
             let preCutedQuery = ''
 
             queryArray.forEach(symbol => {
-              if (productName.includes(symbol)) {
+              if (preProductName.includes(symbol)) {
                 coincidence++
                 preCutedQuery += symbol
               }
@@ -849,6 +849,7 @@ wsClient.on('connection', async (client, data) => {
               let symbolsRangeAverageArray = []
               for (let cutedQuery of preCutedQuerySeparated) {
                 console.log(productName)
+                let productName = preProductName
                 const resultRegExp = productName.match(new RegExp(regExpGenerate(productName, cutedQuery)))
 
                 if (resultRegExp) {
