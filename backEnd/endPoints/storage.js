@@ -902,7 +902,7 @@ wsClient.on('connection', async (client, data) => {
                 tmpProduct: product
               }
               console.log('average', resProduct.symbolsRangeAverage)
-              if (symbolsRangeAverage <= 6)
+              if (resProduct.symbolsRangeAverage <= 6)
                 resultArray.push(resProduct)
             }
           }
