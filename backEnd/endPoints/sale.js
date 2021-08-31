@@ -36,11 +36,11 @@ router.post('/', async (req, res) => {
 
   if (targetProduct) {
     const activePromo = await mongoPromoAction.findOne({ productKaspiId: data.productKaspiId }).lean().exec()
-
+    console.log('activePromo: ', Boolean(!activePromo))
     if (!activePromo) {
 
       const isUnique = await mongoSale.findOne({ 'productKaspiIdData.offerData.kaspi_id': data.productKaspiId }).lean().exec()
-
+      console.log('isUnique: ', Boolean(isUnique))
       if (isUnique) {
         await deleteSale(data.productKaspiId)
       }
@@ -118,7 +118,7 @@ async function deleteSale (productKaspiId) {
     { 'offerData.kaspi_id': productKaspiId },
     { $inc: { sale: -targetSale.sale, salePrice: (targetSale.productKaspiIdData.offerData.price * (targetSale.sale / 100)) } }
   )
-
+  console.log('result: ', result)
   if (result.nModified) {
     await mongoSale.deleteOne({ 'productKaspiIdData.offerData.kaspi_id': productKaspiId })
   }
