@@ -63,6 +63,7 @@ async function restartPromoActionWorkers () {
   const promoActions = await mongoPromoAction.find().lean().exec()
 
   for (const promoAction of promoActions) {
+    console.log(promoAction.timeOfPromoEnding)
     if (promoAction.productKaspiId.length > 1) {
       if (new Date(promoAction.timeOfPromoEnding) > new Date()) {
         worker.scheduleJob(String(promoAction._id), new Date(promoAction.timeOfPromoEnding), async (y) => {
