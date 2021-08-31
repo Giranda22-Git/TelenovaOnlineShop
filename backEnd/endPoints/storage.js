@@ -848,8 +848,8 @@ wsClient.on('connection', async (client, data) => {
               const preCutedQuerySeparated = preCutedQuery.split(' ')
               let symbolsRangeAverageArray = []
               for (let cutedQuery of preCutedQuerySeparated) {
-                console.log(productName)
                 let productName = preProductName
+                console.log(productName)
                 const resultRegExp = productName.match(new RegExp(regExpGenerate(productName, cutedQuery)))
 
                 if (resultRegExp) {
