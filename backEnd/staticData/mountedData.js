@@ -61,9 +61,9 @@ const promoActionMiddleware = require('./supFunctions.js').promoActionMiddleware
 async function restartPromoActionWorkers () {
   const linkRequiredArray = [1, 4, 5, 6, 7]
   const promoActions = await mongoPromoAction.find().lean().exec()
-
+  const count = await mongoPromoAction.countDocuments()
+  console.log(count)
   for (const promoAction of promoActions) {
-    console.log(promoAction.timeOfPromoEnding)
     if (promoAction.productKaspiId.length > 1) {
       if (new Date(promoAction.timeOfPromoEnding) > new Date()) {
         worker.scheduleJob(String(promoAction._id), new Date(promoAction.timeOfPromoEnding), async (y) => {
@@ -89,8 +89,10 @@ async function restartPromoActionWorkers () {
 
           await mongoPromoAction.deleteOne({ _id: promoAction._id })
         })
+        console.log('promo action worker has been reactivated')
       } else {
         await mongoPromoAction.deleteOne({ _id: promoAction._id })
+        console.log('promo action worker has been deleted')
       }
     }
     else if (promoAction.categoryName.length > 1) {
