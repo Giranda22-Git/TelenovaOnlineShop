@@ -898,11 +898,12 @@ wsClient.on('connection', async (client, data) => {
                 symbolsRangeAverageArraySum += range
               }
               console.log('average1', symbolsRangeAverageArray)
+              console.log('average2', symbolsRangeAverageArraySum / symbolsRangeAverageArray.length)
               const resProduct = {
                 symbolsRangeAverage: symbolsRangeAverageArraySum / symbolsRangeAverageArray.length,
                 tmpProduct: product
               }
-              console.log('average2', resProduct.symbolsRangeAverage)
+              console.log('average3', resProduct.symbolsRangeAverage)
               if (resProduct.symbolsRangeAverage <= 6)
                 resultArray.push(resProduct)
             }
