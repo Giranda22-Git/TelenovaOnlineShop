@@ -831,65 +831,79 @@ wsClient.on('connection', async (client, data) => {
 
             resultArray.push(resProduct)
           } else {
-            let cutedQuery = ''
+            let preCutedQuery = ''
 
             queryArray.forEach(symbol => {
               if (productName.includes(symbol)) {
                 coincidence++
-                cutedQuery += symbol
+                preCutedQuery += symbol
               }
             })
 
             const result = (coincidence / queryArray.length) * 100
 
             if (result >= 80) {
+              preCutedQuery = preCutedQuery.trim()
 
-              const resultRegExp = productName.match(new RegExp(regExpGenerate(productName, cutedQuery)))
+              const preCutedQuerySeparated = preCutedQuery.split(' ')
+              let symbolsRangeAverageArray = []
+              for (let cutedQuery of preCutedQuerySeparated) {
 
-              if (resultRegExp) {
-                cutedQuery = cutedQuery.split('')
-                productName = resultRegExp[0].split('')
-                const symbolIndices = new Array()
+                const resultRegExp = productName.match(new RegExp(regExpGenerate(productName, cutedQuery)))
 
-                cutedQuery.forEach(symbol => {
-                  symbolIndices.push(findIndices(productName, symbol))
-                })
+                if (resultRegExp) {
+                  cutedQuery = cutedQuery.split('')
+                  productName = resultRegExp[0].split('')
+                  const symbolIndices = new Array()
 
-                symbolIndices.forEach((symbol, index) => {
-                  if (symbol.includes(-1)) {
-                    symbolIndices.splice(index, 1)
+                  cutedQuery.forEach(symbol => {
+                    symbolIndices.push(findIndices(productName, symbol))
+                  })
+
+                  symbolIndices.forEach((symbol, index) => {
+                    if (symbol.includes(-1)) {
+                      symbolIndices.splice(index, 1)
+                    }
+                  })
+
+                  const symbolsRangeArray = new Array()
+
+                  for (let index = 1; index < symbolIndices.length; index++) {
+                    const result = nearNumberArray(symbolIndices[index - 1], symbolIndices[index])
+
+                    symbolIndices[index - 1] = [result.first]
+                    symbolIndices[index] = [result.second]
+
+                    if (symbolIndices[index - 1][0] < symbolIndices[index][0]) {
+                      symbolsRangeArray.push(symbolIndices[index][0] - symbolIndices[index - 1][0])
+                    } else {
+                      symbolsRangeArray.push((symbolIndices[index][0] - symbolIndices[index - 1][0]) * Math.PI)
+                    }
                   }
-                })
 
-                const symbolsRangeArray = new Array()
+                  let symbolsRangeAverage = (cutedQuery.length === queryArray.length) ? (arraySum(symbolsRangeArray) / cutedQuery.length) : (arraySum(symbolsRangeArray) / cutedQuery.length + 1)
 
-                for (let index = 1; index < symbolIndices.length; index++) {
-                  const result = nearNumberArray(symbolIndices[index - 1], symbolIndices[index])
-
-                  symbolIndices[index - 1] = [result.first]
-                  symbolIndices[index] = [result.second]
-
-                  if (symbolIndices[index - 1][0] < symbolIndices[index][0]) {
-                    symbolsRangeArray.push(symbolIndices[index][0] - symbolIndices[index - 1][0])
-                  } else {
-                    symbolsRangeArray.push((symbolIndices[index][0] - symbolIndices[index - 1][0]) * Math.PI)
+                  if (symbolsRangeAverage < 0) {
+                    symbolsRangeAverage *= -1
                   }
+
+                  symbolsRangeAverageArray.push(symbolsRangeAverage)
                 }
-
-                let symbolsRangeAverage = (cutedQuery.length === queryArray.length) ? (arraySum(symbolsRangeArray) / cutedQuery.length) : (arraySum(symbolsRangeArray) / cutedQuery.length + 1)
-
-                if (symbolsRangeAverage < 0) {
-                  symbolsRangeAverage *= -1
-                }
-
-                const resProduct = {
-                  symbolsRangeAverage,
-                  tmpProduct: product
-                }
-
-                if (symbolsRangeAverage <= 6)
-                  resultArray.push(resProduct)
               }
+
+              let symbolsRangeAverageArraySum = 0
+
+              for (const range of symbolsRangeAverageArray) {
+                symbolsRangeAverageArraySum += range
+              }
+
+              const resProduct = {
+                symbolsRangeAverage: symbolsRangeAverageArraySum / symbolsRangeAverageArray.length,
+                tmpProduct: product
+              }
+              console.log('average', resProduct.symbolsRangeAverage)
+              if (symbolsRangeAverage <= 6)
+                resultArray.push(resProduct)
             }
           }
         })
