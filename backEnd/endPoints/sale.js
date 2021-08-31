@@ -115,12 +115,14 @@ content-type: application/json
 async function deleteSale (productKaspiId) {
   const targetSale = await mongoSale.findOne({ 'productKaspiIdData.offerData.kaspi_id': productKaspiId }).lean().exec()
   console.log(targetSale)
-  const result = await mongoStorage.updateOne(
-    { 'offerData.kaspi_id': productKaspiId },
-    { $inc: { sale: -targetSale.sale, salePrice: (targetSale.productKaspiIdData.offerData.price * (targetSale.sale / 100)) } }
-  )
+  if (targetSale) {
+    const result = await mongoStorage.updateOne(
+      { 'offerData.kaspi_id': productKaspiId },
+      { $inc: { sale: -targetSale.sale, salePrice: (targetSale.productKaspiIdData.offerData.price * (targetSale.sale / 100)) } }
+    )
 
-  await mongoSale.deleteOne({ 'productKaspiIdData.offerData.kaspi_id': productKaspiId })
+    await mongoSale.deleteOne({ 'productKaspiIdData.offerData.kaspi_id': productKaspiId })
+  }
 }
 
 
