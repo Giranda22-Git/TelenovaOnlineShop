@@ -898,7 +898,7 @@ wsClient.on('connection', async (client, data) => {
                 symbolsRangeAverageArraySum += range
               }
               console.log('average1', symbolsRangeAverageArray)
-              console.log('average2', symbolsRangeAverageArraySum / symbolsRangeAverageArray.length)
+              console.log('average2', symbolsRangeAverageArraySum, symbolsRangeAverageArray.length)
               const resProduct = {
                 symbolsRangeAverage: symbolsRangeAverageArraySum / symbolsRangeAverageArray.length,
                 tmpProduct: product
