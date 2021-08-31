@@ -849,7 +849,7 @@ wsClient.on('connection', async (client, data) => {
               let symbolsRangeAverageArray = []
               for (let cutedQuery of preCutedQuerySeparated) {
                 let productName = preProductName
-                console.log(productName)
+
                 const resultRegExp = productName.match(new RegExp(regExpGenerate(productName, cutedQuery)))
 
                 if (resultRegExp) {
@@ -897,12 +897,12 @@ wsClient.on('connection', async (client, data) => {
               for (const range of symbolsRangeAverageArray) {
                 symbolsRangeAverageArraySum += range
               }
-
+              console.log('average1', resProduct.symbolsRangeAverageArray)
               const resProduct = {
                 symbolsRangeAverage: symbolsRangeAverageArraySum / symbolsRangeAverageArray.length,
                 tmpProduct: product
               }
-              console.log('average', resProduct.symbolsRangeAverage)
+              console.log('average2', resProduct.symbolsRangeAverage)
               if (resProduct.symbolsRangeAverage <= 6)
                 resultArray.push(resProduct)
             }
