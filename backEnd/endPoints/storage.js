@@ -726,7 +726,7 @@ wsClient.on('connection', async (client, data) => {
         'offerData.kaspi_rating': true,
         'offerData.properties': true,
         'offerData.actual_supplier': true,
-        'offerData.ProductCount': true
+        'offerData.product_count': true
       }).lean().exec()
 
       if (data.filters) {
