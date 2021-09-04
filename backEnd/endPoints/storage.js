@@ -278,7 +278,7 @@ router.get('/mostPopular/products/:count', async (req, res) => {
     'offerData.kaspi_id': true,
     'offerData.kaspi_rating': true,
     'offerData.properties': true,
-    'offerData.ProductCount': true
+    'offerData.product_count': true
   }).sort({ 'countOfSold': -1 }).limit(Number(req.params.count)).lean().exec()
 
   res.json(allProducts)
@@ -956,7 +956,7 @@ wsClient.on('connection', async (client, data) => {
             'offerData.kaspi_rating': true,
             'offerData.properties': true,
             'offerData.actual_supplier': true,
-            'offerData.ProductCount': true
+            'offerData.product_count': true
           }).lean().exec()
 
           for (const key in data.filters) {
