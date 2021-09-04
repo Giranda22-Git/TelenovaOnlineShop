@@ -276,7 +276,9 @@ router.get('/mostPopular/products/:count', async (req, res) => {
     'offerData.name': true,
     'offerData.price': true,
     'offerData.kaspi_id': true,
-    'offerData.kaspi_rating': true
+    'offerData.kaspi_rating': true,
+    'offerData.properties': true,
+    'offerData.ProductCount': true
   }).sort({ 'countOfSold': -1 }).limit(Number(req.params.count)).lean().exec()
 
   res.json(allProducts)
