@@ -150,7 +150,8 @@ router.get('/saleGoods', async (req, res) => {
     'offerData.name': true,
     'offerData.price': true,
     'offerData.kaspi_id': true,
-    'offerData.kaspi_rating': true
+    'offerData.kaspi_rating': true,
+    'offerData.product_count': true
   }).lean().exec()
 
   res.json(result)
