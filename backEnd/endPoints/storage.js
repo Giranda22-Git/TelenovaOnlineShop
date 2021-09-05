@@ -138,6 +138,28 @@ router.get('/', async (req, res) => {
 
 
 
+// begin get all goods with sale
+
+router.get('/saleGoods', async (req, res) => {
+  const result = await mongoStorage.find({ active: true, sale: { $ne: 0 } }, {
+    active: true,
+    salePrice: true,
+    sale: true,
+    'offerData.category_list': true,
+    'offerData.images': true,
+    'offerData.name': true,
+    'offerData.price': true,
+    'offerData.kaspi_id': true,
+    'offerData.kaspi_rating': true
+  }).lean().exec()
+
+  res.json(result)
+})
+
+// end get all goods with sale
+
+
+
 // begin get goods by active status
 
 router.get('/active/:status', async (req, res) => {
