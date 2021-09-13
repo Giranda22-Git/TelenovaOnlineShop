@@ -1117,14 +1117,16 @@ function regExpGenerate (productName, str, recurseStr, iteration) {
   })
   result.sort((a, b) => a.result.length - b.result.length)
 
+  if (str === 'клонка') {
+    console.log('regExpRes: ', result)
+  }
+
   if (result.length === 0) {
     if (iteration !== str.length + 1) {
       let tmpRecurseArr = recurseStr.split('')
       tmpRecurseArr.splice(iteration, 1)
       tmpRecurseArr = tmpRecurseArr.join('')
-      console.log('change str: ', tmpRecurseArr)
       const regExpRes = regExpGenerate(productName, tmpRecurseArr, recurseStr, iteration + 1)
-      console.log(regExpRes)
     }
 
     return str.split('').join('.*')
