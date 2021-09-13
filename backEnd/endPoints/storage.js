@@ -771,6 +771,7 @@ wsClient.on('connection', async (client, data) => {
           }
           else if (key === "priceRange") {
             shop = shop.filter(element => {
+              console.log(element.salePrice, Number(data.filters[key][0]), Number(data.filters[key][1]), element.salePrice >= Number(data.filters[key][0]) && element.salePrice <= Number(data.filters[key][1]))
               return element.salePrice >= Number(data.filters[key][0]) && element.salePrice <= Number(data.filters[key][1])
             })
           }
