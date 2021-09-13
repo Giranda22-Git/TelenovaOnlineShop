@@ -1124,7 +1124,7 @@ function regExpGenerate (productName, str, recurseStr, iteration) {
     if (iteration !== str.length) {
       let tmpRecurseArr = recurseStr.split('')
       tmpRecurseArr.splice(iteration, 1).join('')
-      regExpGenerate(productName, tmpRecurseStr, recurseStr, iteration + 1)
+      regExpGenerate(productName, tmpRecurseArr, recurseStr, iteration + 1)
     }
 
     return str.split('').join('.*')
