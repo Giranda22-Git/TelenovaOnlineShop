@@ -1098,14 +1098,12 @@ String.prototype.replaceAt = function(index, replacement) {
 
 function regExpGenerate (productName, str, recurseStr, iteration) {
   let result = new Array()
-  console.log('regExpGenStart: ', productName, str)
   let regExpression = str.split('').join('.*')
 
   result.push({result: productName.match(regExpression), expression: regExpression})
 
   getListIdx(regExpression, '*').forEach(element => {
     const tmpRegExpression = regExpression.replaceAt(element, '?')
-    console.log(tmpRegExpression)
     result.push({result: productName.match(tmpRegExpression), expression: tmpRegExpression})
   })
 
@@ -1117,7 +1115,6 @@ function regExpGenerate (productName, str, recurseStr, iteration) {
   result = result.filter(element => {
     return element.result
   })
-  console.log('regExpGenFinish', result)
   result.sort((a, b) => a.result.length - b.result.length)
 
   if (result.length === 0) {
