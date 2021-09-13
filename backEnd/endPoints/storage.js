@@ -931,7 +931,7 @@ wsClient.on('connection', async (client, data) => {
               if (product.offerData.name.includes('колонка')) {
                 console.log('range: ', resProduct.symbolsRangeAverage)
               }
-              if (resProduct.symbolsRangeAverage <= 15)
+              if (resProduct.symbolsRangeAverage <= 8)
                 resultArray.push(resProduct)
             }
           }
