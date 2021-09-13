@@ -870,7 +870,7 @@ wsClient.on('connection', async (client, data) => {
 
             if (result >= 80) {
               preCutedQuery = preCutedQuery.trim()
-
+              console.log('query: ', preCutedQuery)
               const preCutedQuerySeparated = preCutedQuery.split(' ')
               let symbolsRangeAverageArray = []
               for (let cutedQuery of preCutedQuerySeparated) {
@@ -923,13 +923,14 @@ wsClient.on('connection', async (client, data) => {
               for (const range of symbolsRangeAverageArray) {
                 symbolsRangeAverageArraySum += range
               }
-              console.log('average1', symbolsRangeAverageArray)
-              console.log('average2', symbolsRangeAverageArraySum, symbolsRangeAverageArray.length)
+
               const resProduct = {
                 symbolsRangeAverage: symbolsRangeAverageArraySum / symbolsRangeAverageArray.length,
                 tmpProduct: product
               }
-              console.log('average3', resProduct.symbolsRangeAverage)
+              if (product.offerData.name.includes('колонка')) {
+                console.log(resProduct.symbolsRangeAverage)
+              }
               if (resProduct.symbolsRangeAverage <= 6)
                 resultArray.push(resProduct)
             }
