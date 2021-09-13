@@ -876,7 +876,7 @@ wsClient.on('connection', async (client, data) => {
               for (let cutedQuery of preCutedQuerySeparated) {
                 let productName = preProductName
 
-                const resultRegExp = productName.match(new RegExp(regExpGenerate(productName, cutedQuery)))
+                const resultRegExp = productName.match(new RegExp(regExpGenerate(productName, cutedQuery, cutedQuery, 0)))
                 console.log('preRegExp: ', resultRegExp)
                 if (resultRegExp) {
                   cutedQuery = cutedQuery.split('')
@@ -1096,7 +1096,7 @@ String.prototype.replaceAt = function(index, replacement) {
   return this.substr(0, index) + replacement + this.substr(index + replacement.length)
 }
 
-function regExpGenerate (productName, str) {
+function regExpGenerate (productName, str, recurseStr, iteration) {
   let result = new Array()
   console.log('regExpGenStart: ', productName, str)
   let regExpression = str.split('').join('.*')
@@ -1121,6 +1121,12 @@ function regExpGenerate (productName, str) {
   result.sort((a, b) => a.result.length - b.result.length)
 
   if (result.length === 0) {
+    if (iteration !== str.length) {
+      let tmpRecurseStr = recurseStr
+      tmpRecurseStr.splice(iteration, 1)
+      regExpGenerate(productName, tmpRecurseStr, recurseStr, iteration + 1)
+    }
+
     return str.split('').join('.*')
   }
   else {
