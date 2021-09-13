@@ -1117,8 +1117,8 @@ function regExpGenerate (productName, str, recurseStr, iteration) {
   })
   result.sort((a, b) => a.result.length - b.result.length)
 
-  if (str === 'клонка') {
-    console.log('regExpRes: ', productName, str, result)
+  if (productName === 'умная колонка harman/kardon citation 100 серый') {
+    console.log('target: ', result, str)
   }
 
   if (result.length === 0) {
