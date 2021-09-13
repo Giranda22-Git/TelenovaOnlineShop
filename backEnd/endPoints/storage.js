@@ -1098,7 +1098,7 @@ String.prototype.replaceAt = function(index, replacement) {
 
 function regExpGenerate (productName, str) {
   let result = new Array()
-
+  console.log('regExpGenStart: ', productName, str)
   let regExpression = str.split('').join('.*')
 
   result.push({result: productName.match(regExpression), expression: regExpression})
@@ -1116,7 +1116,7 @@ function regExpGenerate (productName, str) {
   result = result.filter(element => {
     return element.result
   })
-
+  console.log('regExpGenFinish', result)
   result.sort((a, b) => a.result.length - b.result.length)
 
   if (result.length === 0) {
