@@ -877,6 +877,7 @@ wsClient.on('connection', async (client, data) => {
                 let productName = preProductName
 
                 const resultRegExp = productName.match(new RegExp(regExpGenerate(productName, cutedQuery)))
+                console.log('preRegExp: ', resultRegExp)
                 if (resultRegExp) {
                   cutedQuery = cutedQuery.split('')
                   productName = resultRegExp[0].split('')
