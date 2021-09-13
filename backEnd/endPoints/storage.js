@@ -870,19 +870,18 @@ wsClient.on('connection', async (client, data) => {
 
             if (result >= 80) {
               preCutedQuery = preCutedQuery.trim()
-              console.log('query: ', preCutedQuery)
+
               const preCutedQuerySeparated = preCutedQuery.split(' ')
               let symbolsRangeAverageArray = []
               for (let cutedQuery of preCutedQuerySeparated) {
                 let productName = preProductName
 
                 const resultRegExp = productName.match(new RegExp(regExpGenerate(productName, cutedQuery, cutedQuery, 0)))
-                console.log('preRegExp: ', resultRegExp)
+
                 if (resultRegExp) {
                   cutedQuery = cutedQuery.split('')
                   productName = resultRegExp[0].split('')
                   const symbolIndices = new Array()
-                  console.log('RegExp: ', productName)
                   cutedQuery.forEach(symbol => {
                     symbolIndices.push(findIndices(productName, symbol))
                   })
@@ -928,9 +927,7 @@ wsClient.on('connection', async (client, data) => {
                 symbolsRangeAverage: symbolsRangeAverageArraySum / symbolsRangeAverageArray.length,
                 tmpProduct: product
               }
-              if (product.offerData.name.includes('колонка')) {
-                console.log('range: ', resProduct.symbolsRangeAverage)
-              }
+
               if (resProduct.symbolsRangeAverage <= 8)
                 resultArray.push(resProduct)
             }
@@ -1116,10 +1113,6 @@ function regExpGenerate (productName, str, recurseStr, iteration) {
     return element.result
   })
   result.sort((a, b) => a.result.length - b.result.length)
-
-  if (productName === 'умная колонка harman/kardon citation 100 серый') {
-    console.log('target: ', result, str)
-  }
 
   if (result.length === 0) {
     if (iteration !== str.length + 1) {
