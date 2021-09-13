@@ -1127,6 +1127,8 @@ function regExpGenerate (productName, str, recurseStr, iteration) {
       tmpRecurseArr.splice(iteration, 1)
       tmpRecurseArr = tmpRecurseArr.join('')
       const regExpRes = regExpGenerate(productName, tmpRecurseArr, recurseStr, iteration + 1)
+
+      console.log('regExpRes: ', regExpRes)
     }
 
     return str.split('').join('.*')
