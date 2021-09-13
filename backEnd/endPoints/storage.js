@@ -1122,8 +1122,8 @@ function regExpGenerate (productName, str, recurseStr, iteration) {
 
   if (result.length === 0) {
     if (iteration !== str.length) {
-      let tmpRecurseStr = recurseStr
-      tmpRecurseStr.splice(iteration, 1)
+      let tmpRecurseArr = recurseStr.split('')
+      tmpRecurseArr.splice(iteration, 1).join('')
       regExpGenerate(productName, tmpRecurseStr, recurseStr, iteration + 1)
     }
 
