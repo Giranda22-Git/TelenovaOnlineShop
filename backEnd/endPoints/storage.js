@@ -1105,6 +1105,7 @@ function regExpGenerate (productName, str) {
 
   getListIdx(regExpression, '*').forEach(element => {
     const tmpRegExpression = regExpression.replaceAt(element, '?')
+    console.log(tmpRegExpression)
     result.push({result: productName.match(tmpRegExpression), expression: tmpRegExpression})
   })
 
