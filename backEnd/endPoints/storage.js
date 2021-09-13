@@ -1031,17 +1031,17 @@ wsClient.on('connection', async (client, data) => {
         }
 
         allProducts.sort(function (a, b) {
-          if (a.offerData.price < b.offerData.price) {
+          if (a.offerData.salePrice < b.offerData.salePrice) {
             return -1
           }
-          if (a.offerData.price > b.offerData.price) {
+          if (a.offerData.salePrice > b.offerData.salePrice) {
             return 1
           }
           return 0
         })
 
         const finishAnswer = {
-          priceRange: [allProducts[0].offerData.price, allProducts[allProducts.length - 1].offerData.price],
+          priceRange: [allProducts[0].offerData.salePrice, allProducts[allProducts.length - 1].offerData.salePrice],
           filterKeys,
           products: shop
         }
