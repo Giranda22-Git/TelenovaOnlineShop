@@ -877,12 +877,11 @@ wsClient.on('connection', async (client, data) => {
                 let productName = preProductName
 
                 const resultRegExp = productName.match(new RegExp(regExpGenerate(productName, cutedQuery)))
-
                 if (resultRegExp) {
                   cutedQuery = cutedQuery.split('')
                   productName = resultRegExp[0].split('')
                   const symbolIndices = new Array()
-
+                  console.log('RegExp: ', productName)
                   cutedQuery.forEach(symbol => {
                     symbolIndices.push(findIndices(productName, symbol))
                   })
@@ -929,7 +928,7 @@ wsClient.on('connection', async (client, data) => {
                 tmpProduct: product
               }
               if (product.offerData.name.includes('колонка')) {
-                console.log(resProduct.symbolsRangeAverage)
+                console.log('range: ', resProduct.symbolsRangeAverage)
               }
               if (resProduct.symbolsRangeAverage <= 6)
                 resultArray.push(resProduct)
