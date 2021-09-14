@@ -234,18 +234,50 @@ router.get('/typeOfPromo/:typeOfPromo', async (req, res) => {
 
 router.delete('/govno', async (req, res) => {
   const data = req.body
+  const linkRequiredArray = [1, 4, 5, 6, 7]
   const targetPromoAction = await mongoPromoAction.findById(data.id).lean().exec()
-  if (targetPromoAction) {
-    const targetJob = worker.scheduledJobs[String(data.id)]
+  if (linkRequiredArray.includes(targetPromoAction.typeOfPromo)) {
+    if (targetPromoAction) {
+      const targetJob = worker.scheduledJobs[String(data.id)]
 
-    if (targetJob) {
-      targetJob.cancel()
+      if (targetJob) {
+        targetJob.cancel()
+      }
+
+      await deletePromoAction(data.id)
+      res.sendStatus(200)
+    } else {
+      res.sendStatus(500)
     }
-
-    await deletePromoAction(data.id)
-    res.sendStatus(200)
   } else {
-    res.sendStatus(500)
+    if (targetPromoAction) {
+      if (targetPromoAction.productKaspiId) {
+        const targetJob = worker.scheduledJobs[String(targetPromoAction._id)]
+
+        if (targetJob) {
+          targetJob.cancel()
+        }
+
+        await promoActionMiddleware(targetPromoAction._id, -1, false)
+
+        deletePromoAction(targetPromoAction._id)
+      }
+      else if (targetPromoAction.categoryName) {
+        const targetJob = worker.scheduledJobs[String(targetPromoAction._id)]
+
+        if (targetJob) {
+          targetJob.cancel()
+        }
+
+        await promoActionMiddleware(targetPromoAction._id, -1, true)
+
+        deletePromoAction(targetPromoAction._id)
+      }
+
+      res.sendStatus(200)
+    } else {
+      res.sendStatus(500)
+    }
   }
 })
 
