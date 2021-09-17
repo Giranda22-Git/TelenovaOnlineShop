@@ -73,6 +73,7 @@ router.post('/', async (req, res) => {
     paymentMethod: data.paymentMethod,
     cardNumber: data.cardNumber,
     finishPrice: finishPrice - (finishPrice * (sale / 100)),
+    comment: data.comment ? data.comment : '',
     credit: data.credit ? data.credit : false,
     iin: data.iin ? data.iin : '',
     bank: data.bank ? data.bank : '',

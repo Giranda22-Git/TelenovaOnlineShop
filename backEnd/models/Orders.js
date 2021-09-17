@@ -48,6 +48,10 @@ const order = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  comment: {
+    type: String,
+    default: ''
+  },
   payBoxData: {
     type: Object,
     default: {}
