@@ -6,6 +6,9 @@ const mongoStorage = require('../models/Storage.js').mongoStorage
 const mongoCategoryList = require('../models/CategoryList.js').mongoCategoryList
 const mongoPromoCode = require('../models/PromoCode.js').mongoPromoCode
 const mountedData = require('../staticData/mountedData.js').data
+// -590406217
+const bot = require('../botCommands/bot_connect.js')
+
 
 
 // begin get all orders
@@ -82,18 +85,28 @@ router.post('/', async (req, res) => {
 
   const result = await newOrder.save()
 
-  let Query = `https://telenova.bitrix24.kz/rest/51/atlvkfldeh2wezg0/crm.lead.add.json?FIELDS[TITLE]=Заказ из инетернет магазина&FIELDS[NAME]=${data.name}&FIELDS[PHONE][0][VALUE]=${data.phoneNumber}&FIELDS[OPPORTUNITY]=${result.finishPrice}&FIELDS[PHONE][0][VALUE_TYPE]=WORK&FIELDS[ADDRESS]=${data.address}&FIELDS[COMMENTS]=${mountedData.adminFrontUrl + result._id}`
+  const tgMessage = `
+    Имя: ${data.name}
+    Номер телефона: ${data.phoneNumber}
+    Итоговая цена: ${data.finishPrice}
+    Адрес: ${data.address}
+    Ссылка на товар: ${mountedData.adminFrontUrl + result._id}
+  `
 
-  Query = encodeURI(Query)
-  console.log(Query)
+  bot.telegram.sendMessage('-590406217', tgMessage)
 
-  await axios.get(Query)
-    .then(response => {
-      console.log(response.data)
-    })
-    .catch(err => {
-      console.log(err)
-    })
+  // let Query = `https://telenova.bitrix24.kz/rest/51/atlvkfldeh2wezg0/crm.lead.add.json?FIELDS[TITLE]=Заказ из инетернет магазина&FIELDS[NAME]=${data.name}&FIELDS[PHONE][0][VALUE]=${data.phoneNumber}&FIELDS[OPPORTUNITY]=${result.finishPrice}&FIELDS[PHONE][0][VALUE_TYPE]=WORK&FIELDS[ADDRESS]=${data.address}&FIELDS[COMMENTS]=${mountedData.adminFrontUrl + result._id}`
+
+  // Query = encodeURI(Query)
+  // console.log(Query)
+
+  // await axios.get(Query)
+  //   .then(response => {
+  //     console.log(response.data)
+  //   })
+  //   .catch(err => {
+  //     console.log(err)
+  //   })
 
   res.json(result)
 })
@@ -111,7 +124,7 @@ content-type: application/json
       "count": 3
     },
     {
-      "kaspi_id": "100098507",
+      "kaspi_id": "100098506",
       "count": 1
     }
   ],
@@ -170,6 +183,6 @@ router.delete('/deleteAllOrders', async (req, res) => {
   res.json(result)
 })
 // end delete all orders
-
+bot.launch()
 
 module.exports = router
