@@ -88,9 +88,9 @@ router.post('/', async (req, res) => {
   const tgMessage = `
 Имя: ${data.name}
 Номер телефона: ${data.phoneNumber}
-Итоговая цена: ${finishPrice - (finishPrice * (sale / 100))}
+Итоговая цена: ${finishPrice - (finishPrice * (sale / 100))}₸
 Адрес: ${data.address}
-Ссылка на товар: ${mountedData.adminFrontUrl + result._id}
+Ссылка на заказ: ${mountedData.adminFrontUrl + result._id}
   `
 
   bot.telegram.sendMessage('-590406217', tgMessage)
