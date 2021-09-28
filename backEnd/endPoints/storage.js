@@ -677,19 +677,25 @@ router.post('/getGoods/categories', async (req, res) => {
   for (const key in data) {
     if (key === 'firstLevelCategory') {
       shop = shop.filter(element => {
+        if (element.offerData.category_list === undefined) {
+          console.log(element)
+        }
         return element.offerData.category_list[0] === data[key]
       })
     }
     else if (key === 'secondLevelCategory') {
+      if (element.offerData.category_list === undefined) {
+        console.log(element)
+      }
       shop = shop.filter(element => {
         return element.offerData.category_list[1] === data[key]
       })
     }
     else if (key === 'thirdLevelCategory') {
+      if (element.offerData.category_list === undefined) {
+        console.log(element)
+      }
       shop = shop.filter(element => {
-        if (element.offerData.category_list === undefined) {
-          console.log(element)
-        }
         return element.offerData.category_list[2] === data[key]
       })
     }
