@@ -184,18 +184,22 @@ router.get('/active/:status', async (req, res) => {
 router.post('/addGoods', async (req, res) => {
   const data = req.body
   console.log(data)
+  let status = 200
   // добавление всех товаров на склад
   for (const offer of data.offers) {
+    let flag = false
     const inStock = await mongoStorage.findOne({ 'offerData.kaspi_id': offer.kaspi_id })
     if (inStock) {
-      const targetProductTmpData = await mongoStorage.findOne({ 'offerData.kaspi_id': offer.kaspi_id }, { sale: true }).lean().exec()
-      await mongoStorage.updateOne({ 'offerData.kaspi_id': offer.kaspi_id }, {
-        offerData: offer,
-        salePrice: offer.price - (offer.price * (targetProductTmpData.sale / 100))
-      })
-      if (!array_compare(inStock.offerData.category_list, offer.category_list)) {
+      // await mongoStorage.updateOne({ 'offerData.kaspi_id': offer.kaspi_id }, {
+      //   offerData: offer,
+      //   salePrice: offer.price - (offer.price * (targetProductTmpData.sale / 100))
+      // })
+      if (!array_compare(inStock.offerData.category_list, offer.category_list) && inStock.sale === 0) {
         // удаление категорий в случае их изменения
         deleteVoidCategoryTree(inStock.offerData.category_list[0], inStock.offerData.category_list[1], inStock.offerData.category_list[2])
+      } else {
+        flag = true
+        status = 404
       }
     } else {
       const tmp = new mongoStorage({
@@ -206,20 +210,22 @@ router.post('/addGoods', async (req, res) => {
       await tmp.save()
     }
 
-    // добавление категории первого уровня
-    await addFirstLevelCategoryTree(offer.category_list[0])
+    if (flag) {
+      // добавление категории первого уровня
+      await addFirstLevelCategoryTree(offer.category_list[0])
 
-    // добавление категории второго уровня
-    await addSecondLevelCategoryTree(offer.category_list[0], offer.category_list[1])
+      // добавление категории второго уровня
+      await addSecondLevelCategoryTree(offer.category_list[0], offer.category_list[1])
 
-    // добавление категории третьего уровня
-    await addThirdLevelCategoryTree(offer.category_list[0], offer.category_list[1], offer.category_list[2])
+      // добавление категории третьего уровня
+      await addThirdLevelCategoryTree(offer.category_list[0], offer.category_list[1], offer.category_list[2])
 
-    // добавление категорий в лист категорий
-    await addCategoryList(offer.category_list[0], offer.category_list[1], offer.category_list[2])
+      // добавление категорий в лист категорий
+      await addCategoryList(offer.category_list[0], offer.category_list[1], offer.category_list[2])
+    }
   }
 
-  res.sendStatus(200)
+  res.sendStatus(status)
 })
 
 /*
