@@ -687,6 +687,9 @@ router.post('/getGoods/categories', async (req, res) => {
     }
     else if (key === 'thirdLevelCategory') {
       shop = shop.filter(element => {
+        if (element.offerData.category_list === undefined) {
+          console.log(element)
+        }
         return element.offerData.category_list[2] === data[key]
       })
     }
