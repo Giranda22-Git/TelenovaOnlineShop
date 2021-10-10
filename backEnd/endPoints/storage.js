@@ -190,16 +190,15 @@ router.post('/addGoods', async (req, res) => {
     let flag = false
     const inStock = await mongoStorage.findOne({ 'offerData.kaspi_id': offer.kaspi_id })
     if (inStock) {
-      // await mongoStorage.updateOne({ 'offerData.kaspi_id': offer.kaspi_id }, {
-      //   offerData: offer,
-      //   salePrice: offer.price - (offer.price * (targetProductTmpData.sale / 100))
-      // })
-      if (!array_compare(inStock.offerData.category_list, offer.category_list) && inStock.sale === 0) {
+      await mongoStorage.updateOne({ 'offerData.kaspi_id': offer.kaspi_id }, {
+        offerData: offer,
+        salePrice: offer.price - (offer.price * (inStock.sale / 100))
+      })
+      if (!array_compare(inStock.offerData.category_list, offer.category_list)) {
         // удаление категорий в случае их изменения
         deleteVoidCategoryTree(inStock.offerData.category_list[0], inStock.offerData.category_list[1], inStock.offerData.category_list[2])
       } else {
         flag = true
-        status = 404
       }
     } else {
       const tmp = new mongoStorage({
